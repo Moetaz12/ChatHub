@@ -17,6 +17,10 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
 }
 allprojects {
     repositories {
@@ -28,11 +32,13 @@ allprojects {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:26.0.1'
+    compile 'com.android.support:palette-v7:26.0.1'
+    compile 'com.android.support:customtabs:26.0.1'
     compile 'com.android.support:design:26.0.1'
     compile 'com.android.support:recyclerview-v7:26.0.1'
     compile 'com.mcxiaoke.volley:library:1.0.19'
@@ -42,6 +48,16 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.5.2'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.jakewharton:butterknife:8.8.1'
+    compile 'com.google.firebase:firebase-auth:11.6.2'
+    compile 'com.google.firebase:firebase-storage:11.6.2'
+    compile 'com.google.firebase:firebase-database:11.6.2'
+    compile 'com.google.firebase:firebase-crash:11.6.2'
+    compile 'com.firebase:firebase-client-android:2.5.0'
+    compile 'com.firebaseui:firebase-ui:0.4.3'
+    compile 'com.firebaseui:firebase-ui-storage:0.6.0'
+    compile 'de.hdodenhof:circleimageview:2.2.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
+    compile files('libs/CircleImageView-master/gradle/wrapper/gradle-wrapper.jar')
 }
+apply plugin: 'com.google.gms.google-services'

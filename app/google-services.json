@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "101626155533",
+    "firebase_url": "https://chathub-635f9.firebaseio.com",
+    "project_id": "chathub-635f9",
+    "storage_bucket": "chathub-635f9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101626155533:android:7ab0c847013fbecd",
+        "android_client_info": {
+          "package_name": "com.example.moetaz.chathub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101626155533-ajr8k7vp2vhv42360nkao01p022akhk7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.moetaz.chathub",
+            "certificate_hash": "9218ebef9db949944fc33cc1387082d8d5706030"
+          }
+        },
+        {
+          "client_id": "101626155533-eae6em5jh5uvg86kl7vueqdcv82d81k2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEGWpzigdq9oT8-vsPC2GpAfFMKWwjkvo"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101626155533-eae6em5jh5uvg86kl7vueqdcv82d81k2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
