@@ -1,13 +1,40 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.example.moetaz.chathub.ui.fragments.ConversationFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <include
+        android:id="@+id/app_bar"
+        layout="@layout/app_bar">
+    </include>
+    <android.support.v7.widget.RecyclerView
+        android:layout_marginTop="5dp"
+        android:id="@+id/conv_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="0dp"
+        android:layout_weight="9">
 
-</FrameLayout>
+    </android.support.v7.widget.RecyclerView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+         >
+    <EditText
+        android:background="@drawable/rounded_edittext"
+        android:id="@+id/msg"
+        android:hint="Enter a message"
+        android:layout_weight="6"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+        <ImageView
+            android:padding="5dp"
+            android:layout_weight="1"
+            android:id="@+id/send_img"
+            android:scaleType="fitXY"
+            android:src="@drawable/sendicon"
+            android:layout_width="0dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
+</LinearLayout>

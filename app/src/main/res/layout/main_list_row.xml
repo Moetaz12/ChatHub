@@ -2,8 +2,9 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="120dp">
+    android:layout_height="80dp">
     <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -11,27 +12,27 @@
         android:layout_height="match_parent">
         <de.hdodenhof.circleimageview.CircleImageView
             android:src="@drawable/avatar"
-            android:layout_width="94dp"
-            android:layout_height="66dp"
-            android:id="@+id/circleImageView"
+            android:layout_width="66dp"
+            android:layout_height="49dp"
+            android:id="@+id/userimg"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginBottom="8dp"
-            app:layout_constraintVertical_bias="0.0"
-            android:layout_marginLeft="8dp"
+            app:layout_constraintVertical_bias="0.533"
+            android:layout_marginLeft="5dp"
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <TextView
             android:textColor="#000"
-            android:textSize="28dp"
+            android:textSize="25sp"
             android:id="@+id/username"
-            android:layout_width="252dp"
-            android:layout_height="44dp"
+            android:layout_width="249dp"
+            android:layout_height="36dp"
             android:text="Moetaz Ashraf"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="53dp"
-            app:layout_constraintLeft_toRightOf="@+id/circleImageView"
+            android:layout_marginTop="28dp"
+            app:layout_constraintLeft_toRightOf="@+id/userimg"
             android:layout_marginLeft="7dp" />
 
 

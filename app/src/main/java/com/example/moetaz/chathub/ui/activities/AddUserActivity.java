@@ -2,7 +2,6 @@ package com.example.moetaz.chathub.ui.activities;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.ui.fragments.AddUserFragment;
 
