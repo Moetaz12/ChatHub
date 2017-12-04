@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal" android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="80dp"
     android:background="#2ad22a"
 
      >
 <de.hdodenhof.circleimageview.CircleImageView
+    android:layout_margin="10dp"
     android:id="@+id/userpic"
     android:layout_marginTop="10dp"
     android:src="@drawable/avatar"
-    android:layout_width="60dp"
-    android:layout_height="60dp" />
+    android:layout_width="50dp"
+    android:layout_height="50dp" />
 
     <TextView
+
         android:id="@+id/user"
-        android:textSize="20dp"
-        android:layout_marginLeft="50dp"
+        android:textSize="17sp"
+        android:layout_marginLeft="10dp"
         android:layout_gravity="center"
         android:text="Moetaz Ashraf"
         android:layout_width="wrap_content"

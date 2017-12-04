@@ -1,31 +1,40 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+
     tools:context="com.example.moetaz.chathub.ui.fragments.ConversationFragment">
     <include
+
         android:id="@+id/app_bar"
         layout="@layout/app_bar">
     </include>
     <android.support.v7.widget.RecyclerView
-        android:layout_marginTop="5dp"
+
+        android:layout_above="@+id/linearLayout1"
+        android:layout_marginTop="55dp"
         android:id="@+id/conv_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="9">
+        android:layout_height="match_parent"
+         >
 
     </android.support.v7.widget.RecyclerView>
 
     <LinearLayout
+        android:layout_alignParentBottom="true"
+        android:id="@+id/linearLayout1"
+        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="35dp"
          >
     <EditText
+        android:layout_marginLeft="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
         android:background="@drawable/rounded_edittext"
         android:id="@+id/msg"
         android:hint="Enter a message"
-        android:layout_weight="6"
+        android:layout_weight="7"
         android:layout_width="0dp"
         android:layout_height="match_parent" />
         <ImageView
@@ -37,4 +46,4 @@
             android:layout_width="0dp"
             android:layout_height="match_parent" />
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

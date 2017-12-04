@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_alignParentTop="true"
     android:layout_centerHorizontal="true"
-    android:id="@+id/drewer"
+    android:id="@+id/drawer"
 
     >
 <FrameLayout

@@ -38,6 +38,7 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
+    compile files('libs/CircleImageView-master/gradle/wrapper/gradle-wrapper.jar')
     compile 'com.android.support:appcompat-v7:26.0.1'
     compile 'com.android.support:palette-v7:26.0.1'
     compile 'com.android.support:customtabs:26.0.1'
@@ -60,6 +61,5 @@ dependencies {
     compile 'de.hdodenhof:circleimageview:2.2.0'
     testCompile 'junit:junit:4.12'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.8.1'
-    compile files('libs/CircleImageView-master/gradle/wrapper/gradle-wrapper.jar')
 }
 apply plugin: 'com.google.gms.google-services'

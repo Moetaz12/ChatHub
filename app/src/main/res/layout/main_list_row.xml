@@ -24,8 +24,9 @@
             app:layout_constraintLeft_toLeftOf="parent" />
 
         <TextView
+            android:paddingLeft="5dp"
             android:textColor="#000"
-            android:textSize="25sp"
+            android:textSize="23sp"
             android:id="@+id/username"
             android:layout_width="249dp"
             android:layout_height="36dp"

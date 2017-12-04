@@ -44,13 +44,13 @@ import static com.example.moetaz.chathub.Utilities.getUserName;
  * A simple {@link Fragment} subclass.
  */
 public class MainFragment extends Fragment {
-    private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
+    @BindView(R.id.drawer) DrawerLayout drawerLayout;
+    @BindView(R.id.nav) NavigationView navigationView;
     private ActionBarDrawerToggle actionBarDrawerToggle;
-    private Toolbar toolbar;
+    @BindView(R.id.app_bar)  Toolbar toolbar;
     FirebaseAuth firebaseAuth;
     @BindView(R.id.chat_list)  RecyclerView UsersList;
-    FloatingActionButton FAB;
+    @BindView(R.id.add_fab) FloatingActionButton FAB;
     private DatabaseReference mDatabase;
     public MainFragment() {
         // Required empty public constructor
@@ -59,12 +59,9 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Firebase.setAndroidContext(getContext());
         getUserName(getActivity());
-
           firebaseAuth = FirebaseAuth.getInstance();
-
         if (firebaseAuth.getCurrentUser() == null) {
             getActivity().finish();
             startActivity(new Intent(getActivity(), RegiteringActivity.class));
@@ -78,10 +75,6 @@ public class MainFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
-        drawerLayout = (DrawerLayout) view.findViewById(R.id.drewer);
-        navigationView = (NavigationView) view.findViewById(R.id.nav);
-        toolbar = (Toolbar) view.findViewById(R.id.app_bar);
-        FAB = view.findViewById(R.id.add_fab);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         actionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.open, R.string.colse);
         SetListnerToDrawer();
@@ -101,8 +94,6 @@ public class MainFragment extends Fragment {
         mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo").child(Utilities.getUserId())
         .child("conversationInfo");
 
-
-        UsersList = (RecyclerView) view.findViewById(R.id.chat_list);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 

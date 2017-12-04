@@ -5,9 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
@@ -35,6 +40,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * A simple {@link Fragment} subclass.
  */
 public class ConversationFragment extends Fragment {
+    @BindView(R.id.app_bar)
+    Toolbar toolbar;
     Firebase ffMesgs;
     @BindView(R.id.msg)
     EditText mesgToSend;
@@ -63,10 +70,10 @@ public class ConversationFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this,view);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo").child(Utilities.getUserId())
                 .child("conversationInfo").child(UserId).child("messagesInfo");
-
-
+        setHasOptionsMenu(true);
         UsersList = (RecyclerView) view.findViewById(R.id.conv_list);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -81,8 +88,6 @@ public class ConversationFragment extends Fragment {
                     @Override
                     protected void populateViewHolder(final ConversationFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
 
-                        DatabaseReference ComRef = getRef(position);
-                        final String ComKey = ComRef.getKey();
                         viewHolder.message.setText(model.getMsg());
 
                     }
@@ -113,6 +118,13 @@ public class ConversationFragment extends Fragment {
                 mesgToSend.setText("");
             }
         });
+        UsersList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v, int left, int top, int right,int bottom, int oldLeft, int oldTop,int oldRight, int oldBottom)
+            {
+                UsersList.scrollToPosition(UsersList.getAdapter().getItemCount()-1);
+            }
+        });
         return view;
     }
 
@@ -132,11 +144,22 @@ public class ConversationFragment extends Fragment {
     }
 
     public static String getCurrentTime() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");//dd/MM/yyyy
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
         Date now = new Date();
         String strDate = sdfDate.format(now);
         return strDate.replaceAll("-","").replaceAll(" ","")
                 .replaceAll(":","").replaceAll("\\.", "");
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        return super.onOptionsItemSelected(item);
+    }
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.conversation_menu, menu);
     }
 
 }
