@@ -122,7 +122,6 @@ public class MainFragment extends Fragment {
                         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-
                                 Intent intent= new Intent(getContext(),ConversationActivity.class);
                                 intent.putExtra("keyPass",ComKey);
                                 intent.putExtra("keyuser",model.getName());

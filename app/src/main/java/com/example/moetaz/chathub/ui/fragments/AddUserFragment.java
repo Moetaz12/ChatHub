@@ -1,6 +1,7 @@
 package com.example.moetaz.chathub.ui.fragments;
 
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -19,7 +20,11 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.SharedPref;
+import com.example.moetaz.chathub.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
+import com.example.moetaz.chathub.ui.activities.ConversationActivity;
+import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
@@ -32,7 +37,7 @@ import butterknife.ButterKnife;
  * A simple {@link Fragment} subclass.
  */
 public class AddUserFragment extends Fragment implements SearchView.OnQueryTextListener {
-
+    Firebase fConvInfo;
     private FirebaseAuth firebaseAuth;
     private RecyclerView UsersList;
 
@@ -76,6 +81,21 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                         DatabaseReference ComRef = getRef(position);
                         final String ComKey = ComRef.getKey();
                         viewHolder.name.setText(model.getUserName());
+                        viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                fConvInfo = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo");
+
+                                fConvInfo.child(Utilities.getUserId()).child("conversationInfo").child(ComKey)
+                                        .child("name").setValue(model.getUserName());
+                                fConvInfo.child(ComKey).child("conversationInfo").child(Utilities.getUserId())
+                                        .child("name").setValue(new SharedPref(getContext()).GetItem("UserName"));
+                                Intent intent= new Intent(getContext(),ConversationActivity.class);
+                                intent.putExtra("keyPass",ComKey);
+                                intent.putExtra("keyuser",model.getName());
+                                getActivity().startActivity(intent);
+                            }
+                        });
 
                     }
                 };

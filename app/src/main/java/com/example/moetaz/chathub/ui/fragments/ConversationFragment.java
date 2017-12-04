@@ -96,19 +96,20 @@ public class ConversationFragment extends Fragment {
               String Msg =  mesgToSend.getText().toString();
                 ffMesgs = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo");
 
+                String CurrentTime = getCurrentTime();
                 ffMesgs.child(Utilities.getUserId()).child("conversationInfo").child(UserId)
                         .child("messagesInfo")
-                        .child(getCurrentTime()).child("msg").setValue(String.valueOf(Msg));
+                        .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
                 ffMesgs.child(Utilities.getUserId()).child("conversationInfo").child(UserId)
                         .child("messagesInfo")
-                        .child(getCurrentTime()).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
+                        .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
 
                 ffMesgs.child(UserId).child("conversationInfo").child(Utilities.getUserId())
                         .child("messagesInfo")
-                        .child(getCurrentTime()).child("msg").setValue(String.valueOf(Msg));
+                        .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
                 ffMesgs.child(UserId).child("conversationInfo").child(Utilities.getUserId())
                         .child("messagesInfo")
-                        .child(getCurrentTime()).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
+                        .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
                 mesgToSend.setText("");
             }
         });
@@ -134,9 +135,8 @@ public class ConversationFragment extends Fragment {
         SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");//dd/MM/yyyy
         Date now = new Date();
         String strDate = sdfDate.format(now);
-        String lasrString =  strDate.replaceAll("-","").replaceAll(" ","")
+        return strDate.replaceAll("-","").replaceAll(" ","")
                 .replaceAll(":","").replaceAll("\\.", "");
-        return lasrString.substring(0,lasrString.length()-2);
     }
 
 }
