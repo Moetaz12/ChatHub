@@ -1,12 +1,15 @@
-package com.example.moetaz.chathub;
+package com.example.moetaz.chathub.help;
 
 import android.content.Context;
 
+import com.example.moetaz.chathub.SharedPref;
 import com.google.firebase.auth.FirebaseAuth;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+
+import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 
 /**
  * Created by Moetaz on 3/23/2017.
@@ -16,13 +19,17 @@ public class Utilities {
 
 
     public static String getUserId(){
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        try {
+           return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        } catch (Exception e) {
+            return "none";
+        }
     }
 
     public static void getUserName(final Context context){
         final String[] name = new String[1];
         Firebase mUsers;
-        mUsers = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo/"+getUserId());
+        mUsers = new Firebase(FB_ROOT+getUserId());
         mUsers.child("userName").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

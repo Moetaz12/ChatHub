@@ -10,5 +10,6 @@
     <dimen name="appBarLayout_height">70dp</dimen>
     <dimen name="CardView_margin">4dp</dimen>
     <dimen name="AppBarLayout_elevation">4dp</dimen>
+    <dimen name="header_username">17sp</dimen>
 
 </resources>

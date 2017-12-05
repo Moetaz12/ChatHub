@@ -22,7 +22,7 @@ import android.widget.Toast;
 
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.SharedPref;
-import com.example.moetaz.chathub.Utilities;
+import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -36,6 +36,11 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.MESSAGESINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+
 /**
  * A simple {@link Fragment} subclass.
  */
@@ -47,7 +52,7 @@ public class ConversationFragment extends Fragment {
     EditText mesgToSend;
     @BindView(R.id.send_img)
     ImageView img;
-    private RecyclerView UsersList;
+    @BindView(R.id.conv_list) RecyclerView UsersList;
     String UserId;
     String FriendUserName;
     private DatabaseReference mDatabase;
@@ -71,10 +76,9 @@ public class ConversationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this,view);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo").child(Utilities.getUserId())
-                .child("conversationInfo").child(UserId).child("messagesInfo");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
+                .child(CONVERSATIONINFO_NODE).child(UserId).child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
-        UsersList = (RecyclerView) view.findViewById(R.id.conv_list);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -89,7 +93,11 @@ public class ConversationFragment extends Fragment {
                     protected void populateViewHolder(final ConversationFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
 
                         viewHolder.message.setText(model.getMsg());
-
+                        if(model.getSender().equals(new SharedPref(getContext()).GetItem("UserName"))){
+                               viewHolder.img2.setVisibility(View.INVISIBLE);
+                        }else {
+                            viewHolder.img1.setVisibility(View.INVISIBLE);
+                        }
                     }
                 };
 
@@ -99,21 +107,21 @@ public class ConversationFragment extends Fragment {
             public void onClick(View v) {
                 Toast.makeText(getContext(),"hi",Toast.LENGTH_LONG).show();
               String Msg =  mesgToSend.getText().toString();
-                ffMesgs = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo");
+                ffMesgs = new Firebase(FB_ROOT);
 
                 String CurrentTime = getCurrentTime();
-                ffMesgs.child(Utilities.getUserId()).child("conversationInfo").child(UserId)
-                        .child("messagesInfo")
+                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(UserId)
+                        .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
-                ffMesgs.child(Utilities.getUserId()).child("conversationInfo").child(UserId)
-                        .child("messagesInfo")
+                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(UserId)
+                        .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
 
-                ffMesgs.child(UserId).child("conversationInfo").child(Utilities.getUserId())
-                        .child("messagesInfo")
+                ffMesgs.child(UserId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                        .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
-                ffMesgs.child(UserId).child("conversationInfo").child(Utilities.getUserId())
-                        .child("messagesInfo")
+                ffMesgs.child(UserId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                        .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
                 mesgToSend.setText("");
             }

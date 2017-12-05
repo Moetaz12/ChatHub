@@ -15,15 +15,13 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.moetaz.chathub.R;
-import com.example.moetaz.chathub.Utilities;
+import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.example.moetaz.chathub.ui.activities.AddUserActivity;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;
@@ -37,7 +35,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-import static com.example.moetaz.chathub.Utilities.getUserName;
+import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+import static com.example.moetaz.chathub.help.Utilities.getUserName;
 
 
 /**
@@ -89,10 +89,8 @@ public class MainFragment extends Fragment {
             }
         });
 
-
-        setHasOptionsMenu(true);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo").child(Utilities.getUserId())
-        .child("conversationInfo");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
+        .child(CONVERSATIONINFO_NODE);
 
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -156,25 +154,6 @@ public class MainFragment extends Fragment {
 
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.logout) {
-            firebaseAuth.signOut();
-            getActivity().finish();
-            startActivity(new Intent(getActivity(), RegiteringActivity.class));
-            return true;
-
-        }
-
-
-        return super.onOptionsItemSelected(item);
-    }
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
-    }
     private void LogOut(){
         firebaseAuth.signOut();
         getActivity().finish();

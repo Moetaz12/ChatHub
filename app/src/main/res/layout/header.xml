@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
     android:layout_height="80dp"
-    android:background="#2ad22a"
+    android:background="@color/colorPrimary"
 
      >
 <de.hdodenhof.circleimageview.CircleImageView
@@ -14,9 +15,8 @@
     android:layout_height="50dp" />
 
     <TextView
-
         android:id="@+id/user"
-        android:textSize="17sp"
+        android:textSize="@dimen/header_username"
         android:layout_marginLeft="10dp"
         android:layout_gravity="center"
         android:text="Moetaz Ashraf"

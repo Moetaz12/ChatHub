@@ -21,26 +21,25 @@ import android.widget.TextView;
 
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.SharedPref;
-import com.example.moetaz.chathub.Utilities;
+import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class AddUserFragment extends Fragment implements SearchView.OnQueryTextListener {
-    Firebase fConvInfo;
-    private FirebaseAuth firebaseAuth;
-    private RecyclerView UsersList;
-
+    private Firebase fConvInfo;
+    @BindView(R.id.searched_list) RecyclerView UsersList;
     @BindView(R.id.app_bar) Toolbar toolbar;
     private DatabaseReference mDatabase;
     public AddUserFragment() {
@@ -61,10 +60,8 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
         ButterKnife.bind(this,view);
         setHasOptionsMenu(true);
-        toolbar = (Toolbar) view.findViewById(R.id.app_bar);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo");
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        UsersList = (RecyclerView) view.findViewById(R.id.searched_list);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -84,7 +81,7 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                fConvInfo = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo");
+                                fConvInfo = new Firebase(FB_ROOT);
 
                                 fConvInfo.child(Utilities.getUserId()).child("conversationInfo").child(ComKey)
                                         .child("name").setValue(model.getUserName());
