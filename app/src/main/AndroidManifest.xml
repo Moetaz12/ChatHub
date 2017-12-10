@@ -22,8 +22,9 @@
         <activity
             android:name=".ui.activities.ConversationActivity"
             android:label="conv"
-            android:windowSoftInputMode="adjustResize"></activity>
-        <activity android:name=".ui.activities.ProfileActivity"></activity>
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".ui.activities.ProfileActivity" />
+        <activity android:name=".ui.activities.FavouriteListActivity"></activity>
     </application>
 
 </manifest>

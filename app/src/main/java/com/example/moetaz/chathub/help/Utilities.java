@@ -1,8 +1,9 @@
 package com.example.moetaz.chathub.help;
 
 import android.content.Context;
+import android.widget.Toast;
 
-import com.example.moetaz.chathub.SharedPref;
+import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.google.firebase.auth.FirebaseAuth;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -43,7 +44,9 @@ public class Utilities {
             }
         });
 
-
     }
 
+    public static void message(Context context,String m){
+        Toast.makeText(context, m, Toast.LENGTH_SHORT).show();
+    }
 }

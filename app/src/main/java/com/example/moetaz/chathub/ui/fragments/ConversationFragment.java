@@ -18,10 +18,9 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.moetaz.chathub.R;
-import com.example.moetaz.chathub.SharedPref;
+import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.firebase.client.Firebase;
@@ -53,7 +52,7 @@ public class ConversationFragment extends Fragment {
     @BindView(R.id.send_img)
     ImageView img;
     @BindView(R.id.conv_list) RecyclerView UsersList;
-    String UserId;
+    String FriendId;
     String FriendUserName;
     private DatabaseReference mDatabase;
     public ConversationFragment() {
@@ -64,7 +63,7 @@ public class ConversationFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Intent intent = getActivity().getIntent();
-        UserId =  intent.getExtras().getString("keyPass");
+        FriendId =  intent.getExtras().getString("keyPass");
         FriendUserName =  intent.getExtras().getString("keyuser");
 
     }
@@ -75,9 +74,10 @@ public class ConversationFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this,view);
+        ffMesgs = new Firebase(FB_ROOT);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
-                .child(CONVERSATIONINFO_NODE).child(UserId).child(MESSAGESINFO_NODE);
+                .child(CONVERSATIONINFO_NODE).child(FriendId).child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -105,22 +105,20 @@ public class ConversationFragment extends Fragment {
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(),"hi",Toast.LENGTH_LONG).show();
               String Msg =  mesgToSend.getText().toString();
-                ffMesgs = new Firebase(FB_ROOT);
 
                 String CurrentTime = getCurrentTime();
-                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(UserId)
+                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(FriendId)
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
-                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(UserId)
+                ffMesgs.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(FriendId)
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
 
-                ffMesgs.child(UserId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                ffMesgs.child(FriendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("msg").setValue(String.valueOf(Msg));
-                ffMesgs.child(UserId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                ffMesgs.child(FriendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child("sender").setValue(new SharedPref(getContext()).GetItem("UserName"));
                 mesgToSend.setText("");
@@ -162,8 +160,17 @@ public class ConversationFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
-        return super.onOptionsItemSelected(item);
+        switch (id){
+            case R.id.fav_list_action:
+                ffMesgs.child(Utilities.getUserId()).child("FavList").child(FriendId)
+                        .child("favId")
+                        .setValue(FriendId);
+                ffMesgs.child(Utilities.getUserId()).child("FavList").child(FriendId)
+                        .child("favUserName")
+                        .setValue(FriendUserName); break;
+             default:break;
+        }
+        return true;
     }
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {

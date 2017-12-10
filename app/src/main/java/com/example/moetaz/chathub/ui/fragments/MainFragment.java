@@ -14,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,8 @@ import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.example.moetaz.chathub.ui.activities.AddUserActivity;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;
+import com.example.moetaz.chathub.ui.activities.FavouriteListActivity;
+import com.example.moetaz.chathub.ui.activities.ProfileActivity;
 import com.example.moetaz.chathub.ui.activities.RegiteringActivity;
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -84,6 +87,11 @@ public class MainFragment extends Fragment {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.logoutnav:LogOut(); break;
+                    case R.id.profile :startActivity(new Intent(getActivity(), ProfileActivity.class));break;
+                    case R.id.fav :
+                        drawerLayout.closeDrawer(Gravity.LEFT);
+                        startActivity(new Intent(getActivity(), FavouriteListActivity.class));break;
+                    default:break;
                 }
                 return true;
             }
@@ -148,7 +156,7 @@ public class MainFragment extends Fragment {
         public UserHolder(View itemView) {
             super(itemView);
 
-            name = (TextView) itemView.findViewById(R.id.username);
+            name = itemView.findViewById(R.id.username);
             mView = itemView;
         }
 

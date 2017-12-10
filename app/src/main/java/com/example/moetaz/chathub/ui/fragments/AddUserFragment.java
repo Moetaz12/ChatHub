@@ -20,7 +20,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.moetaz.chathub.R;
-import com.example.moetaz.chathub.SharedPref;
+import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;

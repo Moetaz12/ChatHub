@@ -9,7 +9,7 @@
     android:id="@+id/drawer"
 
     >
-<FrameLayout
+<android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.example.moetaz.chathub.ui.fragments.MainFragment">
@@ -40,7 +40,7 @@
         android:elevation="@dimen/fab_elevation"
         android:contentDescription="add" />
 
-</FrameLayout>
+</android.support.design.widget.CoordinatorLayout>
     <android.support.design.widget.NavigationView
 
         android:id="@+id/nav"

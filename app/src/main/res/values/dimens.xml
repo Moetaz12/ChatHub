@@ -11,5 +11,7 @@
     <dimen name="CardView_margin">4dp</dimen>
     <dimen name="AppBarLayout_elevation">4dp</dimen>
     <dimen name="header_username">17sp</dimen>
+    <dimen name="appbar_img_margin">10dp</dimen>
+    <dimen name="conv_msg_textsize">20sp</dimen>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.example.moetaz.chathub;
+package com.example.moetaz.chathub.dataStorage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,7 +17,6 @@ public class SharedPref {
           preferences = PreferenceManager.getDefaultSharedPreferences(this.context);
 
     }
-
 
     public void SaveItem(String key,String value){
 
