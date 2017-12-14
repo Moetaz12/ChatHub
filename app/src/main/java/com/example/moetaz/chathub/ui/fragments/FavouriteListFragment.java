@@ -2,15 +2,18 @@ package com.example.moetaz.chathub.ui.fragments;
 
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import com.example.moetaz.chathub.FavAdapter;
+
+import com.example.moetaz.chathub.adapters.FavAdapter;
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.FavFriend;
@@ -18,6 +21,7 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,13 +34,15 @@ import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
  * A simple {@link Fragment} subclass.
  */
 public class FavouriteListFragment extends Fragment {
+
     private GridLayoutManager gridLayoutManager;
     FavAdapter favAdapter;
-    RecyclerView recyclerView;
+    @BindView(R.id.fav_list) RecyclerView recyclerView;
     private List<FavFriend> favFriendList = new ArrayList<>();
     @BindView(R.id.app_bar)
     Toolbar toolbar;
     private Firebase mFavUser ;
+
     public FavouriteListFragment() {
         // Required empty public constructor
     }
@@ -48,9 +54,9 @@ public class FavouriteListFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_favourite_list, container, false);
         ButterKnife.bind(this,view);
         mFavUser = new Firebase(FB_ROOT+ Utilities.getUserId()+"/FavList");
-        recyclerView =   view.findViewById(R.id.fav_list);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         SetGridManager();
+        setHasOptionsMenu(true);
         favAdapter = new FavAdapter(getActivity(), favFriendList);
         recyclerView.setAdapter(favAdapter);
 
@@ -63,7 +69,7 @@ public class FavouriteListFragment extends Fragment {
                 favFriend.setId("cdlc");
                 favFriend.setUserName(value);
                 favFriendList.add(favFriend);
-                 favAdapter.notifyItemInserted(favFriendList.size()-1);
+                favAdapter.notifyItemInserted(favFriendList.size()-1);
 
             }
 
@@ -94,5 +100,26 @@ public class FavouriteListFragment extends Fragment {
         gridLayoutManager = new GridLayoutManager(getActivity(), 1);
 
         recyclerView.setLayoutManager(gridLayoutManager);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case android.R.id.home:
+                getActivity().finish();
+                 break;
+            default:break;
+        }
+        return true;
+    }
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        try {
+
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (Exception e) {
+
+        }
     }
 }

@@ -79,7 +79,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
         final String EMAIL=email.getText().toString().trim();
         String PASSWORD=password.getText().toString().trim();
 
-        //new SharedPref(getContext()).SaveItem("FriendId",EMAIL.substring(0, EMAIL.indexOf('@')));
+        //new SharedPref(getContext()).SaveItem("friendId",EMAIL.substring(0, EMAIL.indexOf('@')));
         if(TextUtils.isEmpty(EMAIL)){
             Toast.makeText(getContext(),"Enter email",Toast.LENGTH_LONG).show();
             return;

@@ -25,6 +25,7 @@
             tools:layout_editor_absoluteY="20dp" />
 
         <TextView
+            android:fontFamily="sans-serif-condensed"
             android:paddingLeft="5dp"
             android:textColor="#000"
             android:textSize="21sp"

@@ -1,13 +1,16 @@
-package com.example.moetaz.chathub;
+package com.example.moetaz.chathub.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.models.FavFriend;
+import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,7 +20,7 @@ import java.util.List;
  */
 
 public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
-    Context context;
+    private Context context;
     private List<FavFriend> list = new ArrayList<>();
 
     public FavAdapter(Context context,List<FavFriend> list) {
@@ -34,8 +37,17 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        FavFriend favFriend = list.get(position);
+        final FavFriend favFriend = list.get(position);
         holder.textView.setText(favFriend.getUserName());
+        holder.mView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent= new Intent(context,ConversationActivity.class);
+                intent.putExtra(context.getString(R.string.friend_id_envelope),favFriend.getId());
+                intent.putExtra(context.getString(R.string.friend_username_envelope),favFriend.getUserName());
+                context.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -45,9 +57,11 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
+        View mView;
         public MyViewHolder(View itemView) {
             super(itemView);
             textView =itemView.findViewById(R.id.username);
+            mView = itemView;
         }
     }
 }

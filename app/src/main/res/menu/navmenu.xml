@@ -6,6 +6,8 @@
          android:icon="@drawable/profile_icon"/>
         <item android:id="@+id/fav" android:title="Foavourite Friends"
             android:icon="@drawable/fav_icon"/>
+        <item android:id="@+id/about" android:title="About"
+            android:icon="@drawable/fav_icon"/>
         <item android:id="@+id/logoutnav" android:title="Log Out"
             android:icon="@drawable/logout"/>
 

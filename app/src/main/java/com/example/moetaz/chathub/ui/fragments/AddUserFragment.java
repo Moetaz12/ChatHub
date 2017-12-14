@@ -49,6 +49,7 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getActivity().setTitle("Add user");
         setHasOptionsMenu(true);
     }
 
@@ -61,6 +62,7 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         ButterKnife.bind(this,view);
         setHasOptionsMenu(true);
         mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo");
+
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -87,10 +89,23 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                                         .child("name").setValue(model.getUserName());
                                 fConvInfo.child(ComKey).child("conversationInfo").child(Utilities.getUserId())
                                         .child("name").setValue(new SharedPref(getContext()).GetItem("UserName"));
-                                Intent intent= new Intent(getContext(),ConversationActivity.class);
-                                intent.putExtra("keyPass",ComKey);
-                                intent.putExtra("keyuser",model.getName());
-                                getActivity().startActivity(intent);
+
+                                if (Utilities.IsTablet(getContext())) {
+                                    ConversationFragment conversationFragment = new ConversationFragment();
+                                    Bundle bundle = new Bundle();
+                                    bundle.putString(getString(R.string.friend_id_envelope),ComKey);
+                                    bundle.putString(getString(R.string.friend_username_envelope),model.getName());
+                                    conversationFragment.setArguments(bundle);
+                                    getActivity().getSupportFragmentManager().beginTransaction()
+                                            .replace(R.id.fconv, conversationFragment).commit();
+                                }else {
+                                    Intent intent= new Intent(getContext(),ConversationActivity.class);
+                                    intent.putExtra("keyPass",ComKey);
+                                    intent.putExtra("keyuser",model.getName());
+                                    getActivity().startActivity(intent);
+                                }
+
+
                             }
                         });
 
@@ -151,5 +166,29 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
         UsersList.setAdapter(firebaseRecyclerAdapter);
         return true;
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        switch (id){
+            case android.R.id.home:
+                getActivity().finish();
+                //startActivity(new Intent(getContext(), MainActivity.class));
+                break;
+
+            default:break;
+        }
+        return true;
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        try {
+
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } catch (Exception e) {
+
+        }
     }
 }

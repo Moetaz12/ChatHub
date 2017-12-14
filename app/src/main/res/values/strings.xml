@@ -5,4 +5,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="open">open</string>
     <string name="colse">close</string>
+    <string name="friend_id_envelope">keyPass</string>
+    <string name="friend_username_envelope">keyuser</string>
 </resources>

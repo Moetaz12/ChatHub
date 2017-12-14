@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -34,6 +35,9 @@ public class ProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         progressDialog = new ProgressDialog(this);
+        Toolbar toolbar = findViewById(R.id.app_bar);
+        setSupportActionBar(toolbar);
+
         mCheck = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo/"+Utilities.getUserId());
         storageReference = FirebaseStorage.getInstance().getReference();
         imageView = findViewById(R.id.profile_pic);

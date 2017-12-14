@@ -1,14 +1,16 @@
 package com.example.moetaz.chathub.help;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
 import android.widget.Toast;
 
+import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
-import com.google.firebase.auth.FirebaseAuth;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.firebase.auth.FirebaseAuth;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 
@@ -48,5 +50,16 @@ public class Utilities {
 
     public static void message(Context context,String m){
         Toast.makeText(context, m, Toast.LENGTH_SHORT).show();
+    }
+
+    public static boolean isNetworkConnected(Context context) {
+        ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
+    }
+
+
+    public static boolean IsTablet(Context context){
+        return context.getResources().getBoolean(R.bool.isTablet);
+
     }
 }

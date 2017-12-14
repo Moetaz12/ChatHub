@@ -9,4 +9,6 @@ public class FirebaseConstants {
     public static final String FB_ROOT = "https://chathub-635f9.firebaseio.com/usersinfo/";
     public static final String CONVERSATIONINFO_NODE  = "conversationInfo";
     public static final String MESSAGESINFO_NODE = "messagesInfo";
+    public static final String SENDER_NODE = "sender";
+    public static final String MESSAGE_NODE = "msg";
 }
