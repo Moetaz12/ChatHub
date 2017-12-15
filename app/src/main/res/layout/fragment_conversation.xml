@@ -4,46 +4,49 @@
     android:layout_height="match_parent"
 
     tools:context="com.example.moetaz.chathub.ui.fragments.ConversationFragment">
+
     <include
 
         android:id="@+id/app_bar"
-        layout="@layout/app_bar">
-    </include>
+        layout="@layout/app_bar"></include>
+
     <android.support.v7.widget.RecyclerView
 
-        android:layout_above="@+id/linearLayout1"
-        android:layout_marginTop="55dp"
         android:id="@+id/conv_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-         >
+        android:layout_above="@+id/linearLayout1"
+        android:layout_marginTop="55dp">
 
     </android.support.v7.widget.RecyclerView>
 
     <LinearLayout
-        android:layout_alignParentBottom="true"
         android:id="@+id/linearLayout1"
-        android:layout_marginBottom="5dp"
         android:layout_width="match_parent"
         android:layout_height="35dp"
-         >
-    <EditText
-        android:layout_marginLeft="5dp"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:background="@drawable/rounded_edittext"
-        android:id="@+id/msg"
-        android:hint="Enter a message"
-        android:layout_weight="9"
-        android:layout_width="0dp"
-        android:layout_height="match_parent" />
-        <ImageView
-            android:padding="5dp"
-            android:layout_weight="1"
-            android:id="@+id/send_img"
-            android:scaleType="fitXY"
-            android:src="@drawable/sendicon"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="5dp">
+
+        <EditText
+
+            android:id="@+id/msg"
             android:layout_width="0dp"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:layout_marginStart="5dp"
+            android:layout_weight="9"
+            android:background="@drawable/rounded_edittext"
+            android:hint="@string/enter_a_message"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp" />
+
+        <ImageView
+            android:id="@+id/send_img"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:contentDescription="@string/send_msg_desc"
+            android:padding="5dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/sendicon" />
     </LinearLayout>
 </RelativeLayout>

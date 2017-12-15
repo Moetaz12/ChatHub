@@ -12,8 +12,8 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conversation);
-        if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().add(R.id.fconv,new ConversationFragment()).commit();
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.fconv, new ConversationFragment()).commit();
         }
     }
 }

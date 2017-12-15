@@ -1,60 +1,64 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bgregister"
-    >
+    android:background="@drawable/bgregister">
 
     <LinearLayout
-        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:orientation="vertical">
 
 
         <EditText
-            android:inputType="text"
             android:id="@+id/user_name"
-            android:hint="Enter username"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_username"
+            android:inputType="text" />
+
         <EditText
+            android:id="@+id/email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:inputType="textEmailAddress"
-            android:id="@+id/email"
-            android:hint="Enter email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:hint="@string/enter_email"
+            android:inputType="textEmailAddress" />
+
         <EditText
 
-            android:inputType="textEmailAddress"
             android:id="@+id/password"
-            android:hint="Enter password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/enter_password"
+            android:inputType="textEmailAddress" />
 
         <Button
+            android:id="@+id/buRegister"
             style="@style/FirebaseUI.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
             android:layout_marginTop="10dp"
-            android:text="Regitser"
-            android:id="@+id/buRegister"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:contentDescription="@string/signuptn"
+            android:text="@string/regitser" />
+
         <TextView
-            android:textAlignment="center"
-            android:text="Already user log in here"
             android:id="@+id/login"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/already_user"
+            android:text="@string/already_user_log_in_here"
+            android:textAlignment="center" />
+
         <ProgressBar
             android:id="@+id/progress_bar"
-            android:layout_marginTop="30dp"
-            android:layout_gravity="center"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp" />
 
     </LinearLayout>
 

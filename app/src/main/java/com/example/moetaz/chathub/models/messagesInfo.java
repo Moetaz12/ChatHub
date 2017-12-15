@@ -10,7 +10,7 @@ public class messagesInfo {
     private String sender;
     private String userName;
 
-    public messagesInfo(){
+    public messagesInfo() {
 
     }
 
@@ -24,12 +24,9 @@ public class messagesInfo {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
-    }
-
-    public void setMsg(String msg) {
-        this.msg = msg;
     }
 
     public String getMsg() {
@@ -37,8 +34,8 @@ public class messagesInfo {
         return msg;
     }
 
-    public void setSender(String sender) {
-        this.sender = sender;
+    public void setMsg(String msg) {
+        this.msg = msg;
     }
 
     public String getSender() {
@@ -46,15 +43,17 @@ public class messagesInfo {
         return sender;
     }
 
-
-
-    public void setUserName(String userName) {
-
-        this.userName = userName;
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public String getUserName() {
 
         return userName;
+    }
+
+    public void setUserName(String userName) {
+
+        this.userName = userName;
     }
 }

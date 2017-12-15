@@ -53,6 +53,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 import static com.example.moetaz.chathub.help.Utilities.isTablet;
 
@@ -62,15 +63,22 @@ import static com.example.moetaz.chathub.help.Utilities.isTablet;
  */
 public class MainFragment extends Fragment {
 
-    @BindView(R.id.drawer) DrawerLayout drawerLayout  ;
-    @BindView(R.id.nav) NavigationView navigationView;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
-    @BindView(R.id.app_bar)  Toolbar toolbar;
+    @BindView(R.id.drawer)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.nav)
+    NavigationView navigationView;
+    @BindView(R.id.app_bar)
+    Toolbar toolbar;
     FirebaseAuth firebaseAuth;
-    @BindView(R.id.chat_list)  RecyclerView usersList;
-    @BindView(R.id.add_fab) FloatingActionButton fab;
+    @BindView(R.id.chat_list)
+    RecyclerView usersList;
+    @BindView(R.id.add_fab)
+    FloatingActionButton fab;
+    private ActionBarDrawerToggle actionBarDrawerToggle;
     private DatabaseReference mDatabase;
-    private StorageReference storageReference;;
+    private StorageReference storageReference;
+    ;
+
     public MainFragment() {
         // Required empty public constructor
     }
@@ -78,13 +86,12 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MobileAds.initialize(getContext(),"ca-app-pub-1046628266446479~5914992735");
+        MobileAds.initialize(getContext(), getString(R.string.admob_projectId));
         Firebase.setAndroidContext(getContext());
-          firebaseAuth = FirebaseAuth.getInstance();
+        firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             getActivity().finish();
             startActivity(new Intent(getActivity(), RegiteringActivity.class));
-
         }
         storageReference = FirebaseStorage.getInstance().getReference();
 
@@ -107,19 +114,19 @@ public class MainFragment extends Fragment {
         mAdView.loadAd(adRequest);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
-        .child(CONVERSATIONINFO_NODE);
+                .child(CONVERSATIONINFO_NODE);
 
         usersList.setHasFixedSize(true);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         setDrawerLayoutHeight();
 
         if (Utilities.isNetworkConnected(getContext())) {
-            final FirebaseRecyclerAdapter<messagesInfo,UserHolder> firebaseRecyclerAdapter =
+            final FirebaseRecyclerAdapter<messagesInfo, UserHolder> firebaseRecyclerAdapter =
                     new FirebaseRecyclerAdapter<messagesInfo, UserHolder>(
                             messagesInfo.class
-                            ,R.layout.main_list_row
-                            ,UserHolder.class
-                            ,mDatabase
+                            , R.layout.main_list_row
+                            , UserHolder.class
+                            , mDatabase
                     ) {
                         @Override
                         protected void populateViewHolder(final UserHolder viewHolder, final messagesInfo model, final int position) {
@@ -133,16 +140,16 @@ public class MainFragment extends Fragment {
                                     if (isTablet(getContext())) {
                                         ConversationFragment conversationFragment = new ConversationFragment();
                                         Bundle bundle = new Bundle();
-                                        bundle.putString(getString(R.string.friend_id_envelope),ComKey);
-                                        bundle.putString(getString(R.string.friend_username_envelope),model.getName());
+                                        bundle.putString(getString(R.string.friend_id_envelope), ComKey);
+                                        bundle.putString(getString(R.string.friend_username_envelope), model.getName());
                                         conversationFragment.setArguments(bundle);
                                         getActivity().getSupportFragmentManager().beginTransaction()
                                                 .replace(R.id.fconv, conversationFragment).commit();
 
-                                    }else {
-                                        Intent intent= new Intent(getContext(),ConversationActivity.class);
-                                        intent.putExtra(getString(R.string.friend_id_envelope),ComKey);
-                                        intent.putExtra(getString(R.string.friend_username_envelope),model.getName());
+                                    } else {
+                                        Intent intent = new Intent(getContext(), ConversationActivity.class);
+                                        intent.putExtra(getString(R.string.friend_id_envelope), ComKey);
+                                        intent.putExtra(getString(R.string.friend_username_envelope), model.getName());
                                         getActivity().startActivity(intent);
                                     }
                                 }
@@ -153,11 +160,12 @@ public class MainFragment extends Fragment {
                             DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    StorageReference filepath = storageReference.child("usersProfilePic/" + ComKey + ".jpg");
-                                    if (dataSnapshot.hasChild("hasProfilePic")) {
+                                    StorageReference filepath = storageReference
+                                            .child(getString(R.string.picsFolderFirebase) + ComKey + getString(R.string.jpgExt));
+                                    if (dataSnapshot.hasChild(HASPROFILEPIC)) {
                                         Glide.with(getActivity()).using(new FirebaseImageLoader())
                                                 .load(filepath).into(viewHolder.imageView);
-                                    }else {
+                                    } else {
 
                                     }
                                 }
@@ -171,13 +179,13 @@ public class MainFragment extends Fragment {
                     };
 
             usersList.setAdapter(firebaseRecyclerAdapter);
-        }else {
-            Utilities.message(getContext(),getString(R.string.checking_internet_msg));
+        } else {
+            Utilities.message(getContext(), getString(R.string.checking_internet_msg));
         }
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(new Intent(getActivity(),AddUserActivity.class));
+                startActivity(new Intent(getActivity(), AddUserActivity.class));
             }
         });
 
@@ -196,11 +204,12 @@ public class MainFragment extends Fragment {
         DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                StorageReference filepath = storageReference.child("usersProfilePic/" + Utilities.getUserId() + ".jpg");
-                if (dataSnapshot.hasChild("hasProfilePic")) {
+                StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
+                        + Utilities.getUserId() + getString(R.string.jpgExt));
+                if (dataSnapshot.hasChild(HASPROFILEPIC)) {
                     Glide.with(getActivity()).using(new FirebaseImageLoader())
                             .load(filepath).into(imageView);
-                }else {
+                } else {
                     imageView.setBackgroundResource(R.drawable.avatar);
                 }
             }
@@ -219,11 +228,11 @@ public class MainFragment extends Fragment {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
-        int displayViewHeight  = size.y;
-        int displayViewwidth = size.x ;
+        int displayViewHeight = size.y;
+        int displayViewwidth = size.x;
         ViewGroup.LayoutParams params = drawerLayout.getLayoutParams();
-        params.height = displayViewHeight  ;
-        params.width = displayViewwidth ;
+        params.height = displayViewHeight;
+        params.width = displayViewwidth;
         drawerLayout.setLayoutParams(params);
     }
 
@@ -233,15 +242,21 @@ public class MainFragment extends Fragment {
             public boolean onNavigationItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.logoutnav:
-                        logOut(); break;
-                    case R.id.profile :
-                        drawerLayout.closeDrawer(Gravity.LEFT);
-                        startActivity(new Intent(getActivity(), ProfileActivity.class));break;
-                    case R.id.fav :
-                        drawerLayout.closeDrawer(Gravity.LEFT);
-                        startActivity(new Intent(getActivity(), FavouriteListActivity.class));break;
-                    case R.id.about :startActivity(new Intent(getActivity(), AboutActivity.class));break;
-                    default:break;
+                        logOut();
+                        break;
+                    case R.id.profile:
+                        drawerLayout.closeDrawer(Gravity.START);
+                        startActivity(new Intent(getActivity(), ProfileActivity.class));
+                        break;
+                    case R.id.fav:
+                        drawerLayout.closeDrawer(Gravity.START);
+                        startActivity(new Intent(getActivity(), FavouriteListActivity.class));
+                        break;
+                    case R.id.about:
+                        startActivity(new Intent(getActivity(), AboutActivity.class));
+                        break;
+                    default:
+                        break;
                 }
                 return true;
             }
@@ -249,7 +264,7 @@ public class MainFragment extends Fragment {
     }
 
     private void setListnerToDrawer() {
-        if(Build.VERSION.SDK_INT >= 23)
+        if (Build.VERSION.SDK_INT >= 23)
             drawerLayout.addDrawerListener(actionBarDrawerToggle);
         else
             drawerLayout.setDrawerListener(actionBarDrawerToggle);
@@ -257,11 +272,18 @@ public class MainFragment extends Fragment {
         actionBarDrawerToggle.syncState();
     }
 
-    public static class UserHolder extends RecyclerView.ViewHolder{
+    private void logOut() {
+        firebaseAuth.signOut();
+        getActivity().finish();
+        startActivity(new Intent(getActivity(), RegiteringActivity.class));
+    }
+
+    public static class UserHolder extends RecyclerView.ViewHolder {
 
         ImageView imageView;
         TextView name;
         View mView;
+
         public UserHolder(View itemView) {
             super(itemView);
 
@@ -270,12 +292,6 @@ public class MainFragment extends Fragment {
             mView = itemView;
         }
 
-    }
-
-    private void logOut(){
-        firebaseAuth.signOut();
-        getActivity().finish();
-        startActivity(new Intent(getActivity(), RegiteringActivity.class));
     }
 
 

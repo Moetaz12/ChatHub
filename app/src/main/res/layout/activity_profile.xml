@@ -9,7 +9,7 @@
 
     <include
         android:id="@+id/app_bar"
-        layout="@layout/app_bar"> </include>
+        layout="@layout/app_bar"></include>
 
     <ImageView
         android:id="@+id/profile_pic"
@@ -18,56 +18,65 @@
         android:layout_gravity="center"
         android:layout_marginBottom="20dp"
         android:layout_marginTop="20dp"
+        android:contentDescription="@string/prfile_pic"
         android:scaleType="fitXY"
         android:src="@drawable/avatar"
 
         />
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:paddingLeft="20dp"
         android:layout_width="match_parent"
-        android:layout_height="55dp">
+        android:layout_height="55dp"
+        android:orientation="horizontal"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp">
 
         <ImageView
-            android:layout_weight="1"
-            android:src="@drawable/username_ic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-             />
+            android:layout_weight="1"
+            android:contentDescription="@string/user_name"
+            android:src="@drawable/username_ic" />
+
         <TextView
-            android:layout_weight="9"
             android:id="@+id/textView_username"
             style="@style/FirebaseUI.Text"
-            android:layout_height="55dp"
             android:layout_width="0dp"
-            android:layout_marginLeft="10dp"
-            android:paddingLeft="10dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="9"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
             android:paddingTop="15dp"
-            android:textSize="20dp" />
+            android:textSize="@dimen/username_profie_textsize" />
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_marginTop="20dp"
-        android:paddingLeft="20dp"
         android:layout_width="match_parent"
-        android:layout_height="55dp">
+        android:layout_height="55dp"
+        android:layout_marginTop="20dp"
+        android:orientation="horizontal"
+        android:paddingEnd="20dp"
+        android:paddingStart="20dp">
+
         <ImageView
-            android:src="@drawable/email_ic"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1" />
-    <TextView
-        android:paddingLeft="10dp"
-        android:layout_weight="9"
-        android:id="@+id/textView_email"
-        style="@style/FirebaseUI.Text"
-        android:layout_width="0dp"
-        android:layout_height="55dp"
-        android:layout_marginLeft="10dp"
-        android:paddingTop="15dp"
-        android:textSize="20dp" />
+            android:layout_weight="1"
+            android:contentDescription="@string/email_desc"
+            android:src="@drawable/email_ic" />
+
+        <TextView
+            android:id="@+id/textView_email"
+            style="@style/FirebaseUI.Text"
+            android:layout_width="0dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="10dp"
+            android:layout_weight="9"
+            android:paddingEnd="10dp"
+            android:paddingStart="10dp"
+            android:paddingTop="15dp"
+            android:textSize="@dimen/email_profile_textsize" />
     </LinearLayout>
 
 </LinearLayout>

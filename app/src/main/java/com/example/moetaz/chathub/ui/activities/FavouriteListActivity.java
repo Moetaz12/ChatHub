@@ -12,8 +12,8 @@ public class FavouriteListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_favourite_list);
-        if(savedInstanceState == null){
-            getSupportFragmentManager().beginTransaction().add(R.id.fav_frame,new FavouriteListFragment())
+        if (savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction().add(R.id.fav_frame, new FavouriteListFragment())
                     .commit();
         }
     }

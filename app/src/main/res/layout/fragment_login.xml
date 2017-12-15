@@ -16,15 +16,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:hint=" Enter Email"
+            android:hint="@string/enter_email"
             android:inputType="textEmailAddress" />
 
         <EditText
-            android:layout_margin="10dp"
             android:id="@+id/passWord"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint=" Enter Password"
+            android:layout_margin="10dp"
+            android:hint="@string/enter_password"
             android:inputType="textEmailAddress" />
 
         <Button
@@ -32,14 +32,16 @@
             style="@style/FirebaseUI.Button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Log in" />
+            android:contentDescription="@string/loginbtn"
+            android:text="@string/log_in" />
 
         <TextView
             android:id="@+id/tx_signup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="new user register here"
+            android:contentDescription="@string/new_user"
+            android:text="@string/new_user_register_here"
             android:textAlignment="center" />
 
         <ProgressBar

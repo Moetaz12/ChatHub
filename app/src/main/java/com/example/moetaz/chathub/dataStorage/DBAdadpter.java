@@ -7,30 +7,26 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-
 public class DBAdadpter {
 
-    private Context context;
-    private SQLiteDatabase sqLiteDatabase;
-    private static  DBAdadpter dbAdadpter;
     private static final String DB_NAME = "convdatabase.db";
     private static final int DB_VERSION = 1;
     private static final String TABLE_NAME = "convtable";
-
     private static final String MESSAGE = "message";
+    private static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " ("
+            + MESSAGE + " TEXT PRIMARY KEY )";
+    private static DBAdadpter dbAdadpter;
+    private Context context;
+    private SQLiteDatabase sqLiteDatabase;
 
-    private static final String CREATE_TABLE = "CREATE TABLE "+TABLE_NAME+" ("
-            +MESSAGE+" TEXT PRIMARY KEY )"
-            ;
-
-    private DBAdadpter (Context context){
+    private DBAdadpter(Context context) {
         this.context = context;
-        sqLiteDatabase = new SqlHelpter(this.context,DB_NAME,null,DB_VERSION).getWritableDatabase();
+        sqLiteDatabase = new SqlHelpter(this.context, DB_NAME, null, DB_VERSION).getWritableDatabase();
 
     }
 
-    public static DBAdadpter getDBAdadpterInstance (Context context){
-        if (dbAdadpter == null){
+    public static DBAdadpter getDBAdadpterInstance(Context context) {
+        if (dbAdadpter == null) {
             dbAdadpter = new DBAdadpter(context);
 
         }
@@ -38,21 +34,21 @@ public class DBAdadpter {
     }
 
     public long insertMessage(ContentValues values) {
-        return sqLiteDatabase.insert(TABLE_NAME,null,values);
+        return sqLiteDatabase.insert(TABLE_NAME, null, values);
     }
 
 
     public Cursor getMessages() {
         return sqLiteDatabase.query(TABLE_NAME
-                ,new String []{MESSAGE},null,null,null,null,null,null);
+                , new String[]{MESSAGE}, null, null, null, null, null, null);
     }
 
 
     public int deleteConv() {
-          return sqLiteDatabase.delete(TABLE_NAME,null,null);
+        return sqLiteDatabase.delete(TABLE_NAME, null, null);
     }
 
-    private static class SqlHelpter extends SQLiteOpenHelper{
+    private static class SqlHelpter extends SQLiteOpenHelper {
 
         public SqlHelpter(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
             super(context, name, factory, version);

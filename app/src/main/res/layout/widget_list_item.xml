@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <TextView
-        android:textSize="13sp"
-        android:text="Test"
         android:id="@+id/widgettext"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="#000"
         android:gravity="center_vertical"
-        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingEnd="?android:attr/listPreferredItemPaddingEnd"
-        android:minHeight="?android:attr/listPreferredItemHeightSmall" />
+        android:paddingStart="?android:attr/listPreferredItemPaddingStart"
+        android:textColor="#000"
+        android:textSize="13sp" />
 </LinearLayout>

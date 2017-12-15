@@ -27,7 +27,7 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
     private Context context;
     private List<FavFriend> list = new ArrayList<>();
 
-    public FavAdapter(Context context,List<FavFriend> list) {
+    public FavAdapter(Context context, List<FavFriend> list) {
         this.context = context;
         this.list = list;
     }
@@ -46,19 +46,18 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (Utilities.isTablet(context)){
+                if (Utilities.isTablet(context)) {
                     ConversationFragment conversationFragment = new ConversationFragment();
                     Bundle bundle = new Bundle();
-                    bundle.putString(context.getString(R.string.friend_id_envelope),favFriend.getId());
-                    bundle.putString(context.getString(R.string.friend_username_envelope),favFriend.getUserName());
+                    bundle.putString(context.getString(R.string.friend_id_envelope), favFriend.getId());
+                    bundle.putString(context.getString(R.string.friend_username_envelope), favFriend.getUserName());
                     conversationFragment.setArguments(bundle);
-                    ((AppCompatActivity)context).getSupportFragmentManager().beginTransaction()
+                    ((AppCompatActivity) context).getSupportFragmentManager().beginTransaction()
                             .replace(R.id.fconv, conversationFragment).commit();
-                }else
-                {
-                    Intent intent= new Intent(context,ConversationActivity.class);
-                    intent.putExtra(context.getString(R.string.friend_id_envelope),favFriend.getId());
-                    intent.putExtra(context.getString(R.string.friend_username_envelope),favFriend.getUserName());
+                } else {
+                    Intent intent = new Intent(context, ConversationActivity.class);
+                    intent.putExtra(context.getString(R.string.friend_id_envelope), favFriend.getId());
+                    intent.putExtra(context.getString(R.string.friend_username_envelope), favFriend.getUserName());
                     context.startActivity(intent);
                 }
             }
@@ -73,9 +72,10 @@ public class FavAdapter extends RecyclerView.Adapter<FavAdapter.MyViewHolder> {
     public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView textView;
         View mView;
+
         public MyViewHolder(View itemView) {
             super(itemView);
-            textView =itemView.findViewById(R.id.username);
+            textView = itemView.findViewById(R.id.username);
             mView = itemView;
         }
     }

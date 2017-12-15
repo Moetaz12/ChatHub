@@ -17,7 +17,7 @@ public class ConvWidget extends AppWidgetProvider {
     static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
                                 int appWidgetId) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.conv_widget);
-        views.setTextViewText(R.id.widget_title,  new SharedPref(context).GetItem("userWidget"));
+        views.setTextViewText(R.id.widget_title, new SharedPref(context).GetItem(context.getString(R.string.userwidget_pref)));
         setRemoteAdapter(context, views);
 
         appWidgetManager.updateAppWidget(appWidgetId, views);

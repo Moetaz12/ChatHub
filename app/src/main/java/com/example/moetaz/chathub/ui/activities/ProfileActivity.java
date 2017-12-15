@@ -32,50 +32,56 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
+import static com.example.moetaz.chathub.help.FirebaseConstants.EMAIL_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
 public class ProfileActivity extends AppCompatActivity {
     private static final int REQUET_CODE = 1;
     ImageView imageView;
     Firebase mCheck;
-    TextView textViewEmail,textViewUsername;
+    TextView textViewEmail, textViewUsername;
     ProgressDialog progressDialog;
-    private StorageReference storageReference;
     DatabaseReference DatabaseRef;
+    private StorageReference storageReference;
     private Toolbar toolbar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
         progressDialog = new ProgressDialog(this);
-          toolbar = findViewById(R.id.app_bar);
+        toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
 
-        mCheck = new Firebase("https://chathub-635f9.firebaseio.com/usersinfo/"+Utilities.getUserId());
+        mCheck = new Firebase(FB_ROOT + Utilities.getUserId());
         storageReference = FirebaseStorage.getInstance().getReference();
         imageView = findViewById(R.id.profile_pic);
         textViewEmail = findViewById(R.id.textView_email);
         textViewUsername = findViewById(R.id.textView_username);
         setSupportActionBar(toolbar);
-        toolbar.setTitle("Profile");
+        toolbar.setTitle(R.string.profile_title);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                startActivityForResult(intent,REQUET_CODE);
+                startActivityForResult(intent, REQUET_CODE);
             }
         });
 
-          DatabaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
+        DatabaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
                 .child(Utilities.getUserId());
         DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                StorageReference filepath = storageReference.child("usersProfilePic/" + Utilities.getUserId() + ".jpg");
-                if (dataSnapshot.hasChild("hasProfilePic")) {
+                StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
+                        + Utilities.getUserId() + getString(R.string.jpgExt));
+                if (dataSnapshot.hasChild(HASPROFILEPIC)) {
                     Glide.with(getApplicationContext()).using(new FirebaseImageLoader())
                             .load(filepath).into(imageView);
-                }else {
+                } else {
                     imageView.setBackgroundResource(R.drawable.avatar);
                 }
             }
@@ -92,7 +98,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setNameInfo() {
 
-        DatabaseRef.child("userName").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseRef.child(USERNAME_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 textViewUsername.setText(dataSnapshot.getValue(String.class));
@@ -106,7 +112,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setEmailInfo() {
-        DatabaseRef.child("email").addListenerForSingleValueEvent(new ValueEventListener() {
+        DatabaseRef.child(EMAIL_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 textViewEmail.setText(dataSnapshot.getValue(String.class));
@@ -123,8 +129,8 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUET_CODE && resultCode == RESULT_OK) {
-           progressDialog.setMessage("Upload");
-           progressDialog.show();
+            progressDialog.setMessage(getString(R.string.upload_meg));
+            progressDialog.show();
 
             Bundle bundle = data.getExtras();
             Bitmap bitmap = (Bitmap) bundle.get("data");
@@ -133,11 +139,12 @@ public class ProfileActivity extends AppCompatActivity {
             byte[] bData = baos.toByteArray();
             imageView.setImageBitmap(bitmap);
 
-            StorageReference filepath = storageReference.child("usersProfilePic/" + Utilities.getUserId() + ".jpg");
+            StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
+                    + Utilities.getUserId() + getString(R.string.jpgExt));
             filepath.putBytes(bData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    Firebase childRef3 = mCheck.child("hasProfilePic");
+                    Firebase childRef3 = mCheck.child(HASPROFILEPIC);
                     childRef3.setValue("1");
                     progressDialog.dismiss();
                     Uri downloadurl = taskSnapshot.getDownloadUrl();

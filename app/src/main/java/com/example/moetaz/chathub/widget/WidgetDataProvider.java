@@ -20,10 +20,9 @@ import static com.example.moetaz.chathub.provider.ConvProivderConstants.CONTENT_
 
 public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory {
     ContentResolver contentResolver;
-    private List<String> collection = new ArrayList<>();
-
     Intent intent;
     Context context;
+    private List<String> collection = new ArrayList<>();
 
     public WidgetDataProvider(Intent intent, Context context) {
 
@@ -40,9 +39,9 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     private void InitiData() {
         collection.clear();
         contentResolver = context.getContentResolver();
-        Cursor cursor = contentResolver.query(CONTENT_URI_1,null,null,null,null);
-        if(cursor != null && cursor.getCount() > 0){
-            while (cursor.moveToNext()){
+        Cursor cursor = contentResolver.query(CONTENT_URI_1, null, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
+            while (cursor.moveToNext()) {
                 collection.add(cursor.getString(0));
             }
         }
@@ -68,7 +67,7 @@ public class WidgetDataProvider implements RemoteViewsService.RemoteViewsFactory
     @Override
     public RemoteViews getViewAt(int position) {
         RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widget_list_item);
-        remoteViews.setTextViewText(R.id.widgettext,collection.get(position));
+        remoteViews.setTextViewText(R.id.widgettext, collection.get(position));
         return remoteViews;
     }
 

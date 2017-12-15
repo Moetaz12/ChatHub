@@ -36,11 +36,16 @@ import static com.example.moetaz.chathub.help.Utilities.saveUserName;
 public class LoginFragment extends Fragment implements View.OnClickListener {
 
 
-    @BindView(R.id.bu_signin) Button Signin;
-    @BindView(R.id.eMail) EditText email;
-    @BindView(R.id.passWord) EditText password;
-    @BindView(R.id.tx_signup) TextView Signup;
-    @BindView(R.id.progress_bar) ProgressBar progressBar  ;
+    @BindView(R.id.bu_signin)
+    Button Signin;
+    @BindView(R.id.eMail)
+    EditText email;
+    @BindView(R.id.passWord)
+    EditText password;
+    @BindView(R.id.tx_signup)
+    TextView Signup;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
     private FirebaseAuth firebaseAuth;
 
     public LoginFragment() {
@@ -53,8 +58,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         firebaseAuth = FirebaseAuth.getInstance();
 
         Firebase.setAndroidContext(getContext());
-        if(firebaseAuth.getCurrentUser() != null){
-            startActivity(new Intent(getActivity().getApplication(),MainActivity.class));
+        if (firebaseAuth.getCurrentUser() != null) {
+            startActivity(new Intent(getActivity().getApplication(), MainActivity.class));
             getActivity().finish();
         }
     }
@@ -64,8 +69,8 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view= inflater.inflate(R.layout.fragment_login, container, false);
-        ButterKnife.bind(this,view);
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
+        ButterKnife.bind(this, view);
 
         Signup.setOnClickListener(this);
         Signin.setOnClickListener(this);
@@ -73,35 +78,34 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
-    private void userLogin(){
-        String emailStr=email.getText().toString().trim();
-        String passwordStr=password.getText().toString().trim();
+    private void userLogin() {
+        String emailStr = email.getText().toString().trim();
+        String passwordStr = password.getText().toString().trim();
 
-        if(TextUtils.isEmpty(emailStr)){
-            Toast.makeText(getContext(),"Enter email",Toast.LENGTH_LONG).show();
+        if (TextUtils.isEmpty(emailStr)) {
+            Toast.makeText(getContext(), getString(R.string.enter_email), Toast.LENGTH_LONG).show();
             return;
         }
-        if(TextUtils.isEmpty(passwordStr)){
-            Toast.makeText(getContext(),"Enter password",Toast.LENGTH_LONG).show();
+        if (TextUtils.isEmpty(passwordStr)) {
+            Toast.makeText(getContext(), getString(R.string.enter_password), Toast.LENGTH_LONG).show();
             return;
         }
 
         progressBar.setVisibility(View.VISIBLE);
 
-        firebaseAuth.signInWithEmailAndPassword(emailStr,passwordStr)
+        firebaseAuth.signInWithEmailAndPassword(emailStr, passwordStr)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         progressBar.setVisibility(View.INVISIBLE);
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             saveUserName(getActivity());
                             getActivity().finish();
-                            startActivity(new Intent(getContext(),MainActivity.class));
-                        }
-                        else{
+                            startActivity(new Intent(getContext(), MainActivity.class));
+                        } else {
 
-                            Log.e("Error",task.getException().getMessage());
-                            Toast.makeText(getContext(),task.getException().getMessage(),Toast.LENGTH_LONG).show();
+                            Log.e("Error", task.getException().getMessage());
+                            Toast.makeText(getContext(), task.getException().getMessage(), Toast.LENGTH_LONG).show();
                         }
 
                     }
@@ -112,12 +116,12 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
 
-        if(view == Signin){
+        if (view == Signin) {
             userLogin();
         }
-        if(view == Signup){
+        if (view == Signup) {
             getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fregiter,new SignupFragment())
+                    .replace(R.id.fregiter, new SignupFragment())
                     .commit();
         }
     }

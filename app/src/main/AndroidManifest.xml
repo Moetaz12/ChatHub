@@ -32,7 +32,7 @@
         <provider
             android:name=".provider.ConvProvider"
             android:authorities="com.example.moetaz.chathub"
-            android:exported="true"> </provider>
+            android:exported="true"></provider>
 
         <receiver android:name=".widget.ConvWidget">
             <intent-filter>
@@ -44,10 +44,10 @@
                 android:resource="@xml/conv_widget_info" />
         </receiver>
 
-        <service android:name=".widget.WidgetService"
+        <service
+            android:name=".widget.WidgetService"
             android:exported="true"
-            android:permission="android.permission.BIND_REMOTEVIEWS"
-            />
+            android:permission="android.permission.BIND_REMOTEVIEWS" />
 
     </application>
 

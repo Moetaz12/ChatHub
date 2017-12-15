@@ -1,72 +1,113 @@
 package com.example.moetaz.chathub.ui.activities;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.android.volley.Cache;
-import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
 import com.example.moetaz.chathub.R;
-import com.example.moetaz.chathub.help.Mysingleton;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class AboutActivity extends AppCompatActivity {
 
     String url = "https://api.myjson.com/bins/szagr";
     TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         textView = findViewById(R.id.about_app);
-        LoadByVolley();
+        new MyAsyncTask(url).execute();
 
     }
 
-    private void LoadByVolley() {
 
-        Cache cache = Mysingleton.getInstance(getApplicationContext()).getRequestQueue().getCache();
-        Cache.Entry entry = cache.get(url);
-        if (entry != null) {
+    class MyAsyncTask extends AsyncTask<Void, Void, String> {
+
+        String strUrl = null;
+
+        public MyAsyncTask(String url) {
+
+            this.strUrl = url;
+        }
+
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            HttpURLConnection urlConnection = null;
+            BufferedReader reader = null;
+            String jsonStr = null;
 
             try {
-                String data = new String(entry.data, "UTF-8");
-                JSONObject jsonObject =new JSONObject(data);
+
+                URL url = new URL(strUrl);
+                urlConnection = (HttpURLConnection) url.openConnection();
+                urlConnection.setRequestMethod("GET");
+                urlConnection.connect();
+                InputStream inputStream = urlConnection.getInputStream();
+                StringBuffer buffer = new StringBuffer();
+                if (inputStream == null) {
+
+                    return null;
+                }
+                reader = new BufferedReader(new InputStreamReader(inputStream));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+
+                    buffer.append(line + "\n");
+                }
+
+                if (buffer.length() == 0) {
+                    return null;
+                }
+                jsonStr = buffer.toString();
+
+            } catch (IOException e) {
+
+
+                return null;
+            } finally {
+                if (urlConnection != null) {
+                    urlConnection.disconnect();
+                }
+                if (reader != null) {
+                    try {
+                        reader.close();
+                    } catch (final IOException e) {
+
+                    }
+                }
+            }
+            return jsonStr;
+        }
+
+        @Override
+        protected void onPostExecute(String mstring) {
+
+            try {
+                JSONObject jsonObject = new JSONObject(mstring);
                 textView.setText(jsonObject.getString("desc"));
-
-            } catch (UnsupportedEncodingException e) {
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-        } else {
+        }
 
 
-            StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    try {
-                        JSONObject jsonObject =new JSONObject(response);
-                        textView.setText(jsonObject.getString("desc"));
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-
-                }
-            });
-            Mysingleton.getInstance(getApplicationContext()).addToRequest(stringRequest);
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
         }
     }
 }

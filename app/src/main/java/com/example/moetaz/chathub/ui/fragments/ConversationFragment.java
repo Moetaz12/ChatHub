@@ -46,14 +46,17 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static com.example.moetaz.chathub.provider.ConvProivderConstants.CONTENT_URI_1;
-import static com.example.moetaz.chathub.provider.ConvProivderConstants.MESSAGE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FAVID_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FAVLIST_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FAVUSERNAME;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 import static com.example.moetaz.chathub.help.FirebaseConstants.MESSAGESINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.MESSAGE_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.SENDER_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+import static com.example.moetaz.chathub.provider.ConvProivderConstants.CONTENT_URI_1;
+import static com.example.moetaz.chathub.provider.ConvProivderConstants.MESSAGE;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,13 +64,13 @@ import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 public class ConversationFragment extends Fragment {
     @BindView(R.id.app_bar)
     Toolbar toolbar;
-    private Firebase mRef,mCovRef;
     @BindView(R.id.msg)
     EditText mesgToSend;
     @BindView(R.id.send_img)
     ImageView img;
     @BindView(R.id.conv_list)
     RecyclerView usersList;
+    private Firebase mRef, mCovRef,newRef;
     private String friendId;
     private String friendUserName;
     private DatabaseReference mDatabase;
@@ -76,6 +79,14 @@ public class ConversationFragment extends Fragment {
 
     public ConversationFragment() {
         // Required empty public constructor
+    }
+
+    public static String getCurrentTime() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        Date now = new Date();
+        String strDate = sdfDate.format(now);
+        return strDate.replaceAll("-", "").replaceAll(" ", "")
+                .replaceAll(":", "").replaceAll("\\.", "");
     }
 
     @Override
@@ -104,8 +115,8 @@ public class ConversationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this, view);
         mRef = new Firebase(FB_ROOT);
-        mCovRef = new Firebase(FB_ROOT+"/"+Utilities.getUserId()+"/"+CONVERSATIONINFO_NODE
-                +"/"+friendId+"/"+MESSAGESINFO_NODE);
+        mCovRef = new Firebase(FB_ROOT + "/" + Utilities.getUserId() + "/" + CONVERSATIONINFO_NODE
+                + "/" + friendId + "/" + MESSAGESINFO_NODE);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
                 .child(CONVERSATIONINFO_NODE).child(friendId).child(MESSAGESINFO_NODE);
@@ -127,10 +138,10 @@ public class ConversationFragment extends Fragment {
                         viewHolder.message.setText(model.getMsg());
                         if (model.getSender().equals(new SharedPref(getContext()).GetItem("UserName"))) {
                             viewHolder.img2.setVisibility(View.INVISIBLE);
-                            setImage(Utilities.getUserId(),viewHolder.img1);
+                            setImage(Utilities.getUserId(), viewHolder.img1);
                         } else {
                             viewHolder.img1.setVisibility(View.INVISIBLE);
-                            setImage(friendId,viewHolder.img2);
+                            setImage(friendId, viewHolder.img2);
                         }
                     }
                 };
@@ -147,14 +158,16 @@ public class ConversationFragment extends Fragment {
                         .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
                 mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext()).GetItem("UserName"));
+                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext())
+                        .GetItem(getString(R.string.usrename_pref)));
 
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext()).GetItem("UserName"));
+                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext())
+                        .GetItem(getString(R.string.usrename_pref)));
                 mesgToSend.setText("");
                 try {
                     Thread.sleep(2000);
@@ -172,7 +185,7 @@ public class ConversationFragment extends Fragment {
         return view;
     }
 
-    private void setImage(final String id, final ImageView imageView){
+    private void setImage(final String id, final ImageView imageView) {
         DatabaseReference DatabaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
                 .child(id);
         DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -182,7 +195,7 @@ public class ConversationFragment extends Fragment {
                 if (dataSnapshot.hasChild("hasProfilePic")) {
                     Glide.with(getActivity()).using(new FirebaseImageLoader())
                             .load(filepath).into(imageView);
-                }else {
+                } else {
 
                 }
             }
@@ -194,30 +207,6 @@ public class ConversationFragment extends Fragment {
         });
     }
 
-    public static class UserHolder extends RecyclerView.ViewHolder {
-        CircleImageView img1;
-        CircleImageView img2;
-        TextView message;
-
-        public UserHolder(View itemView) {
-            super(itemView);
-
-            message = (TextView) itemView.findViewById(R.id.user_msg);
-            img1 = itemView.findViewById(R.id.user_img1);
-            img2 = itemView.findViewById(R.id.user_img2);
-
-        }
-
-    }
-
-    public static String getCurrentTime() {
-        SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-        Date now = new Date();
-        String strDate = sdfDate.format(now);
-        return strDate.replaceAll("-", "").replaceAll(" ", "")
-                .replaceAll(":", "").replaceAll("\\.", "");
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -227,15 +216,22 @@ public class ConversationFragment extends Fragment {
 
                 break;
             case R.id.fav_list_action:
-                mRef.child(Utilities.getUserId()).child("FavList").child(friendId)
-                        .child("favId")
+                mRef.child(Utilities.getUserId()).child(FAVLIST_NODE).child(friendId)
+                        .child(FAVID_NODE)
                         .setValue(friendId);
-                mRef.child(Utilities.getUserId()).child("FavList").child(friendId)
-                        .child("favUserName")
+                mRef.child(Utilities.getUserId()).child(FAVLIST_NODE).child(friendId)
+                        .child(FAVUSERNAME)
                         .setValue(friendUserName);
+                Utilities.message(getContext(),getString(R.string.fvav_list_msg));
                 break;
-            case R.id.addwidget:addToWidget();break;
-            case R.id.deleteconversation: mCovRef.removeValue();
+            case R.id.addwidget:
+                addToWidget();
+                break;
+            case R.id.deleteconversation:
+                newRef = new Firebase(FB_ROOT + "/" + Utilities.getUserId() + "/" + CONVERSATIONINFO_NODE
+                        + "/" + friendId );
+                newRef.removeValue();
+                getActivity().finish();
             default:
                 break;
         }
@@ -243,21 +239,21 @@ public class ConversationFragment extends Fragment {
     }
 
     private void addToWidget() {
-        new SharedPref(getContext()).SaveItem("userWidget",friendUserName);
+        new SharedPref(getContext()).SaveItem(getString(R.string.userwidget_pref), friendUserName);
         contentResolver.delete(CONTENT_URI_1,
                 null, null);
         final ContentValues cv = new ContentValues();
         mCovRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(com.firebase.client.DataSnapshot dataSnapshot, String s) {
-                String sender = dataSnapshot.child("sender").getValue(String.class);
+                String sender = dataSnapshot.child(SENDER_NODE).getValue(String.class);
                 if (sender.equals(Utilities.getUserName(getContext()))) {
                     sender = "me";
                 }
-                String msg = dataSnapshot.child("msg").getValue(String.class);
-                String finalString = sender+" : "+msg;
-                cv.put(MESSAGE,finalString);
-                  contentResolver.insert(CONTENT_URI_1,cv);
+                String msg = dataSnapshot.child(MESSAGE_NODE).getValue(String.class);
+                String finalString = sender + " : " + msg;
+                cv.put(MESSAGE, finalString);
+                contentResolver.insert(CONTENT_URI_1, cv);
             }
 
             @Override
@@ -300,6 +296,22 @@ public class ConversationFragment extends Fragment {
 
             }
         }
+    }
+
+    public static class UserHolder extends RecyclerView.ViewHolder {
+        CircleImageView img1;
+        CircleImageView img2;
+        TextView message;
+
+        public UserHolder(View itemView) {
+            super(itemView);
+
+            message = (TextView) itemView.findViewById(R.id.user_msg);
+            img1 = itemView.findViewById(R.id.user_img1);
+            img2 = itemView.findViewById(R.id.user_img2);
+
+        }
+
     }
 
 }

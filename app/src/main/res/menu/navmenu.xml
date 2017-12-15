@@ -2,14 +2,22 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group>
 
-     <item android:id="@+id/profile" android:title="Profile"
-         android:icon="@drawable/profile_icon"/>
-        <item android:id="@+id/fav" android:title="Favourite Friends"
-            android:icon="@drawable/fav_icon"/>
-        <item android:id="@+id/about" android:title="About"
-            android:icon="@drawable/about_icon"/>
-        <item android:id="@+id/logoutnav" android:title="Log Out"
-            android:icon="@drawable/logout"/>
+        <item
+            android:id="@+id/profile"
+            android:icon="@drawable/profile_icon"
+            android:title="@string/profile" />
+        <item
+            android:id="@+id/fav"
+            android:icon="@drawable/fav_icon"
+            android:title="@string/favourite_friends" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/about_icon"
+            android:title="@string/about" />
+        <item
+            android:id="@+id/logoutnav"
+            android:icon="@drawable/logout"
+            android:title="@string/log_out" />
 
     </group>
 

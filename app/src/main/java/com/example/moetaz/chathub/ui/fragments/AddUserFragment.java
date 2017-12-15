@@ -40,18 +40,26 @@ import com.google.firebase.storage.StorageReference;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
+import static com.example.moetaz.chathub.help.FirebaseConstants.NAME_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class AddUserFragment extends Fragment implements SearchView.OnQueryTextListener {
-    private Firebase fConvInfo;
-    @BindView(R.id.searched_list) RecyclerView UsersList;
-    @BindView(R.id.app_bar) Toolbar toolbar;
-    private DatabaseReference mDatabase;
+    @BindView(R.id.searched_list)
+    RecyclerView UsersList;
+    @BindView(R.id.app_bar)
+    Toolbar toolbar;
     StorageReference storageReference;
+    private Firebase fConvInfo;
+    private DatabaseReference mDatabase;
+    String currentUserId;
+
     public AddUserFragment() {
         // Required empty public constructor
     }
@@ -59,9 +67,10 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        getActivity().setTitle("Add user");
+        getActivity().setTitle(getString(R.string.add_user_title));
         setHasOptionsMenu(true);
         storageReference = FirebaseStorage.getInstance().getReference();
+        currentUserId = Utilities.getUserId();
     }
 
     @Override
@@ -70,20 +79,20 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_add_user, container, false);
 
-        ButterKnife.bind(this,view);
+        ButterKnife.bind(this, view);
         setHasOptionsMenu(true);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child("usersinfo");
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final FirebaseRecyclerAdapter<messagesInfo,AddUserFragment.UserHolder> firebaseRecyclerAdapter =
+        final FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder>(
                         messagesInfo.class
-                        ,R.layout.main_list_row
-                        ,AddUserFragment.UserHolder.class
-                        ,mDatabase
+                        , R.layout.main_list_row
+                        , AddUserFragment.UserHolder.class
+                        , mDatabase
                 ) {
                     @Override
                     protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
@@ -95,27 +104,7 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                             @Override
                             public void onClick(View v) {
                                 fConvInfo = new Firebase(FB_ROOT);
-
-                                fConvInfo.child(Utilities.getUserId()).child("conversationInfo").child(ComKey)
-                                        .child("name").setValue(model.getUserName());
-                                fConvInfo.child(ComKey).child("conversationInfo").child(Utilities.getUserId())
-                                        .child("name").setValue(new SharedPref(getContext()).GetItem("UserName"));
-
-                                if (Utilities.isTablet(getContext())) {
-                                    ConversationFragment conversationFragment = new ConversationFragment();
-                                    Bundle bundle = new Bundle();
-                                    bundle.putString(getString(R.string.friend_id_envelope),ComKey);
-                                    bundle.putString(getString(R.string.friend_username_envelope),model.getName());
-                                    conversationFragment.setArguments(bundle);
-                                    getActivity().getSupportFragmentManager().beginTransaction()
-                                            .replace(R.id.fconv, conversationFragment).commit();
-                                }else {
-                                    Intent intent= new Intent(getContext(),ConversationActivity.class);
-                                    intent.putExtra("keyPass",ComKey);
-                                    intent.putExtra("keyuser",model.getName());
-                                    getActivity().startActivity(intent);
-                                }
-
+                                launchConvFragment(ComKey, model.getUserName());
 
                             }
                         });
@@ -124,11 +113,12 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                         DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
-                                StorageReference filepath = storageReference.child("usersProfilePic/" + ComKey + ".jpg");
-                                if (dataSnapshot.hasChild("hasProfilePic")) {
+                                StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
+                                        + ComKey + getString(R.string.jpgExt));
+                                if (dataSnapshot.hasChild(HASPROFILEPIC)) {
                                     Glide.with(getActivity()).using(new FirebaseImageLoader())
                                             .load(filepath).into(viewHolder.imageView);
-                                }else {
+                                } else {
 
                                 }
                             }
@@ -146,18 +136,27 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
         return view;
     }
-    public static class UserHolder extends RecyclerView.ViewHolder{
-        ImageView imageView;
-        TextView name;
-        View mView;
-        public UserHolder(View itemView) {
-            super(itemView);
 
-              imageView =itemView.findViewById(R.id.userimg);
-            name = (TextView) itemView.findViewById(R.id.username);
-            mView = itemView;
+    private void launchConvFragment(String friendId, String friendUsername) {
+        fConvInfo.child(currentUserId).child(CONVERSATIONINFO_NODE).child(friendId)
+                .child(NAME_NODE).setValue(friendUsername);
+        fConvInfo.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                .child(NAME_NODE).setValue(new SharedPref(getContext()).GetItem(getString(R.string.usrename_pref)));
+
+        if (Utilities.isTablet(getContext())) {
+            ConversationFragment conversationFragment = new ConversationFragment();
+            Bundle bundle = new Bundle();
+            bundle.putString(getString(R.string.friend_id_envelope), friendId);
+            bundle.putString(getString(R.string.friend_username_envelope), friendUsername);
+            conversationFragment.setArguments(bundle);
+            getActivity().getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.fconv, conversationFragment).commit();
+        } else {
+            Intent intent = new Intent(getContext(), ConversationActivity.class);
+            intent.putExtra(getString(R.string.friend_id_envelope), friendId);
+            intent.putExtra(getString(R.string.friend_username_envelope), friendUsername);
+            getActivity().startActivity(intent);
         }
-
     }
 
     @Override
@@ -178,12 +177,12 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        final FirebaseRecyclerAdapter<messagesInfo,AddUserFragment.UserHolder> firebaseRecyclerAdapter =
+        final FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder>(
                         messagesInfo.class
-                        ,R.layout.main_list_row
-                        ,AddUserFragment.UserHolder.class
-                        ,mDatabase.orderByChild("userName").equalTo(newText)
+                        , R.layout.main_list_row
+                        , AddUserFragment.UserHolder.class
+                        , mDatabase.orderByChild(USERNAME_NODE).equalTo(newText)
                 ) {
                     @Override
                     protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
@@ -191,23 +190,29 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                         DatabaseReference ComRef = getRef(position);
                         final String ComKey = ComRef.getKey();
                         viewHolder.name.setText(model.getUserName());
-
+                        viewHolder.mView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                launchConvFragment(ComKey, model.getUserName());
+                            }
+                        });
                     }
                 };
 
         UsersList.setAdapter(firebaseRecyclerAdapter);
         return true;
     }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        switch (id){
+        switch (id) {
             case android.R.id.home:
                 getActivity().finish();
-                //startActivity(new Intent(getContext(), MainActivity.class));
                 break;
 
-            default:break;
+            default:
+                break;
         }
         return true;
     }
@@ -216,10 +221,24 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         try {
-
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         } catch (Exception e) {
 
         }
+    }
+
+    public static class UserHolder extends RecyclerView.ViewHolder {
+        ImageView imageView;
+        TextView name;
+        View mView;
+
+        public UserHolder(View itemView) {
+            super(itemView);
+
+            imageView = itemView.findViewById(R.id.userimg);
+            name = (TextView) itemView.findViewById(R.id.username);
+            mView = itemView;
+        }
+
     }
 }

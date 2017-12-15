@@ -13,20 +13,16 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Thread timer=new Thread() {
+        Thread timer = new Thread() {
             public void run() {
 
-                try
-                {
+                try {
                     sleep(3000);
-                }
-                catch (InterruptedException e)
-                {
+                } catch (InterruptedException e) {
                     e.printStackTrace();
-                }
-                finally {
+                } finally {
                     finish();
-                    startActivity(new Intent(getApplication(),RegiteringActivity.class));
+                    startActivity(new Intent(getApplication(), RegiteringActivity.class));
                 }
             }
 

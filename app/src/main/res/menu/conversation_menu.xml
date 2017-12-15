@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/fav_list_action"
-        android:title="Add to favourite list"
-        app:showAsAction="never"
-        >
-    </item>
-    <item android:id="@+id/deleteconversation"
-        android:title="Delete conversation"
-        app:showAsAction="never"/>
+    <item
+        android:id="@+id/fav_list_action"
+        android:title="@string/add_to_favourite_list"
+        app:showAsAction="never"></item>
+    <item
+        android:id="@+id/deleteconversation"
+        android:title="@string/delete_conversation"
+        app:showAsAction="never" />
 
-    <item android:id="@+id/addwidget"
-        android:title="Add to widget"
+    <item
+        android:id="@+id/addwidget"
+        android:title="@string/add_to_widget"
         app:showAsAction="never">
 
     </item>

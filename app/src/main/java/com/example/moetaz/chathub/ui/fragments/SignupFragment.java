@@ -29,23 +29,32 @@ import com.google.firebase.database.FirebaseDatabase;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.example.moetaz.chathub.help.FirebaseConstants.EMAIL_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERID_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 import static com.example.moetaz.chathub.help.Utilities.saveUserName;
 
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SignupFragment extends Fragment implements View.OnClickListener{
+public class SignupFragment extends Fragment implements View.OnClickListener {
 
-    @BindView(R.id.buRegister) Button Regiter;
-    @BindView(R.id.email) EditText email;
-    @BindView(R.id.user_name) EditText UserName;
-    @BindView(R.id.password) EditText password;
-    @BindView(R.id.login) TextView signin;
-
+    @BindView(R.id.buRegister)
+    Button Regiter;
+    @BindView(R.id.email)
+    EditText email;
+    @BindView(R.id.user_name)
+    EditText UserName;
+    @BindView(R.id.password)
+    EditText password;
+    @BindView(R.id.login)
+    TextView signin;
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase;
-    @BindView(R.id.progress_bar)
-    ProgressBar progressBar  ;
+
     public SignupFragment() {
         // Required empty public constructor
     }
@@ -55,15 +64,16 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.fragment_signup, container, false);;
-        ButterKnife.bind(this,view);
-        firebaseAuth= FirebaseAuth.getInstance();
+        View view = inflater.inflate(R.layout.fragment_signup, container, false);
+        ;
+        ButterKnife.bind(this, view);
+        firebaseAuth = FirebaseAuth.getInstance();
         Firebase.setAndroidContext(getContext());
         mDatabase = FirebaseDatabase.getInstance().getReference();
         progressBar.setVisibility(View.GONE);
-        if(firebaseAuth.getCurrentUser() != null){
+        if (firebaseAuth.getCurrentUser() != null) {
             getActivity().finish();
-            startActivity(new Intent(getContext(),MainActivity.class));
+            startActivity(new Intent(getContext(), MainActivity.class));
 
         }
 
@@ -72,36 +82,36 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
         return view;
     }
 
-    private void RegiterUser(){
+    private void RegiterUser() {
         final String emailStr = email.getText().toString().trim();
         String passwordStr = password.getText().toString().trim();
 
-         if(TextUtils.isEmpty(emailStr)){
-            Toast.makeText(getContext(),"Enter email",Toast.LENGTH_LONG).show();
+        if (TextUtils.isEmpty(emailStr)) {
+            Toast.makeText(getContext(), getString(R.string.enter_email), Toast.LENGTH_LONG).show();
             return;
         }
-        if(TextUtils.isEmpty(passwordStr)){
-            Toast.makeText(getContext(),"Enter password",Toast.LENGTH_LONG).show();
+        if (TextUtils.isEmpty(passwordStr)) {
+            Toast.makeText(getContext(), getString(R.string.enter_password), Toast.LENGTH_LONG).show();
             return;
         }
         progressBar.setVisibility(View.VISIBLE);
-        firebaseAuth.createUserWithEmailAndPassword(emailStr,passwordStr)
+        firebaseAuth.createUserWithEmailAndPassword(emailStr, passwordStr)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
-                            mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child("email").setValue(emailStr);
+                        if (task.isSuccessful()) {
+                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(EMAIL_NODE).setValue(emailStr);
 
-                            mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child("userName").setValue(UserName.getText().toString());
-                            mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child("userid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(USERNAME_NODE).setValue(UserName.getText().toString());
+                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(USERID_NODE).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
                             saveUserName(getActivity());
                             getActivity().finish();
-                            startActivity(new Intent(getContext(),MainActivity.class));
-                        }else{
-                            FirebaseAuthException e = (FirebaseAuthException)task.getException();
+                            startActivity(new Intent(getContext(), MainActivity.class));
+                        } else {
+                            FirebaseAuthException e = (FirebaseAuthException) task.getException();
                             progressBar.setVisibility(View.GONE);
                             return;
                         }
@@ -113,11 +123,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
 
     @Override
     public void onClick(View view) {
-        if(view == Regiter){
+        if (view == Regiter) {
             RegiterUser();
         }
-        if(view==signin){
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fregiter,new LoginFragment())
+        if (view == signin) {
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fregiter, new LoginFragment())
                     .commit();
         }
     }

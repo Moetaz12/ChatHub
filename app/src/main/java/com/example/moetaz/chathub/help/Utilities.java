@@ -13,6 +13,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
 /**
  * Created by Moetaz on 3/23/2017.
@@ -21,23 +22,23 @@ import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 public class Utilities {
 
 
-    public static String getUserId(){
+    public static String getUserId() {
         try {
-           return FirebaseAuth.getInstance().getCurrentUser().getUid();
+            return FirebaseAuth.getInstance().getCurrentUser().getUid();
         } catch (Exception e) {
             return "none";
         }
     }
 
-    public static void saveUserName(final Context context){
+    public static void saveUserName(final Context context) {
         final String[] name = new String[1];
         Firebase mUsers;
-        mUsers = new Firebase(FB_ROOT+getUserId());
-        mUsers.child("userName").addValueEventListener(new ValueEventListener() {
+        mUsers = new Firebase(FB_ROOT + getUserId());
+        mUsers.child(USERNAME_NODE).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                  name[0] = (String)dataSnapshot.getValue();
-               new SharedPref(context).SaveItem("UserName",name[0]);
+                name[0] = (String) dataSnapshot.getValue();
+                new SharedPref(context).SaveItem(context.getString(R.string.usrename_pref), name[0]);
             }
 
             @Override
@@ -47,11 +48,12 @@ public class Utilities {
         });
 
     }
-    public static String getUserName (Context context){
-        return new SharedPref(context).GetItem("UserName");
+
+    public static String getUserName(Context context) {
+        return new SharedPref(context).GetItem(context.getString(R.string.usrename_pref));
     }
 
-    public static void message(Context context,String m){
+    public static void message(Context context, String m) {
         Toast.makeText(context, m, Toast.LENGTH_SHORT).show();
     }
 
@@ -61,7 +63,7 @@ public class Utilities {
     }
 
 
-    public static boolean isTablet(Context context){
+    public static boolean isTablet(Context context) {
         return context.getResources().getBoolean(R.bool.isTablet);
 
     }
