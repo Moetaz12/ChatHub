@@ -1,5 +1,6 @@
-<!-- match parent for height and width attribute in DrawerLayout causes error in tablet mode -->
+
 <android.support.v4.widget.DrawerLayout
+    xmlns:ads="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -8,8 +9,9 @@
     android:layout_alignParentTop="true"
     android:layout_centerHorizontal="true"
     android:id="@+id/drawer"
-
     >
+    <!-- match parent for height and width attribute in DrawerLayout  -->
+    <!-- causes error in tablet mode-->
 <android.support.design.widget.CoordinatorLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -19,15 +21,15 @@
         layout="@layout/app_bar">
     </include>
 
-
     <android.support.v7.widget.RecyclerView
         android:layout_marginTop="56dp"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="20dp"
         android:id="@+id/chat_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
     </android.support.v7.widget.RecyclerView>
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/add_fab"
@@ -36,21 +38,31 @@
         android:layout_gravity="bottom|end"
         android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginBottom="48dp"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
+        android:layout_width="@dimen/fab_width"
+        android:layout_height="@dimen/fab_height"
         android:src="@drawable/add_icon"
         android:elevation="@dimen/fab_elevation"
         android:contentDescription="add" />
+
+    <com.google.android.gms.ads.AdView
+        android:layout_marginTop="400dp"
+        android:id="@+id/adView"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        ads:adSize="BANNER"
+        ads:adUnitId="ca-app-pub-3940256099942544/6300978111">
+    </com.google.android.gms.ads.AdView>
 
 </android.support.design.widget.CoordinatorLayout>
     <android.support.design.widget.NavigationView
 
         android:id="@+id/nav"
-        android:layout_width="250dp"
+        android:layout_width="@dimen/navigationView_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         app:menu="@menu/navmenu"
         app:headerLayout="@layout/header"
         >
     </android.support.design.widget.NavigationView>
+
 </android.support.v4.widget.DrawerLayout>

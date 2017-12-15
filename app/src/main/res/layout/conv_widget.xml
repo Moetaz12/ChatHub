@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#fafdfd"
+    android:layout_margin="@dimen/widget_margin">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#aaDEDFDE"
+        android:orientation="horizontal"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp">
+        <ImageView
+            android:layout_width="32dp"
+            android:layout_height="30dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_launcher_logo"/>
+        <TextView
+            android:id="@+id/widget_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Widget Header"
+            android:layout_gravity="center_vertical"
+            android:textColor="@android:color/black"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textStyle="bold"
+            android:paddingStart="@dimen/widget_header_padding"
+            android:paddingLeft="@dimen/widget_header_padding"
+            android:paddingEnd="@dimen/widget_header_padding"
+            android:paddingRight="@dimen/widget_header_padding"/>
+    </LinearLayout>
+    <ListView
+        android:layout_marginTop="30dp"
+        android:id="@+id/widget_list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+    </ListView>
+
+
+</RelativeLayout>

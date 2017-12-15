@@ -29,7 +29,7 @@ public class Utilities {
         }
     }
 
-    public static void getUserName(final Context context){
+    public static void saveUserName(final Context context){
         final String[] name = new String[1];
         Firebase mUsers;
         mUsers = new Firebase(FB_ROOT+getUserId());
@@ -47,6 +47,9 @@ public class Utilities {
         });
 
     }
+    public static String getUserName (Context context){
+        return new SharedPref(context).GetItem("UserName");
+    }
 
     public static void message(Context context,String m){
         Toast.makeText(context, m, Toast.LENGTH_SHORT).show();
@@ -58,7 +61,7 @@ public class Utilities {
     }
 
 
-    public static boolean IsTablet(Context context){
+    public static boolean isTablet(Context context){
         return context.getResources().getBoolean(R.bool.isTablet);
 
     }

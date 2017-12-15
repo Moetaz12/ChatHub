@@ -8,6 +8,10 @@
     </item>
     <item android:id="@+id/deleteconversation"
         android:title="Delete conversation"
+        app:showAsAction="never"/>
+
+    <item android:id="@+id/addwidget"
+        android:title="Add to widget"
         app:showAsAction="never">
 
     </item>

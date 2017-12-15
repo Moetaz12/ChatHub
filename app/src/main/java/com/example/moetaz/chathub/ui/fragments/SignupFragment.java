@@ -1,7 +1,6 @@
 package com.example.moetaz.chathub.ui.fragments;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -12,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,20 +26,26 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+import static com.example.moetaz.chathub.help.Utilities.saveUserName;
+
 /**
  * A simple {@link Fragment} subclass.
  */
 public class SignupFragment extends Fragment implements View.OnClickListener{
 
+    @BindView(R.id.buRegister) Button Regiter;
+    @BindView(R.id.email) EditText email;
+    @BindView(R.id.user_name) EditText UserName;
+    @BindView(R.id.password) EditText password;
+    @BindView(R.id.login) TextView signin;
 
-    private Button Regiter;
-    private EditText email,UserName;
-    private EditText password;
-    private TextView signin;
-    private ProgressDialog progressDialog;
     private FirebaseAuth firebaseAuth;
     private DatabaseReference mDatabase;
-
+    @BindView(R.id.progress_bar)
+    ProgressBar progressBar  ;
     public SignupFragment() {
         // Required empty public constructor
     }
@@ -50,25 +56,16 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_signup, container, false);;
-
+        ButterKnife.bind(this,view);
         firebaseAuth= FirebaseAuth.getInstance();
         Firebase.setAndroidContext(getContext());
-
         mDatabase = FirebaseDatabase.getInstance().getReference();
-
-        progressDialog=new ProgressDialog(getContext());
+        progressBar.setVisibility(View.GONE);
         if(firebaseAuth.getCurrentUser() != null){
             getActivity().finish();
             startActivity(new Intent(getContext(),MainActivity.class));
 
         }
-
-        Regiter= (Button) view.findViewById(R.id.buRegister);
-        email= (EditText) view.findViewById(R.id.email);
-        password= (EditText) view.findViewById(R.id.password);
-        signin= (TextView) view.findViewById(R.id.login);
-        UserName = (EditText) view.findViewById(R.id.user_name);
-
 
         Regiter.setOnClickListener(this);
         signin.setOnClickListener(this);
@@ -76,39 +73,36 @@ public class SignupFragment extends Fragment implements View.OnClickListener{
     }
 
     private void RegiterUser(){
-        final String EMAIL=email.getText().toString().trim();
-        String PASSWORD=password.getText().toString().trim();
+        final String emailStr = email.getText().toString().trim();
+        String passwordStr = password.getText().toString().trim();
 
-        //new SharedPref(getContext()).SaveItem("friendId",EMAIL.substring(0, EMAIL.indexOf('@')));
-        if(TextUtils.isEmpty(EMAIL)){
+         if(TextUtils.isEmpty(emailStr)){
             Toast.makeText(getContext(),"Enter email",Toast.LENGTH_LONG).show();
             return;
         }
-        if(TextUtils.isEmpty(PASSWORD)){
+        if(TextUtils.isEmpty(passwordStr)){
             Toast.makeText(getContext(),"Enter password",Toast.LENGTH_LONG).show();
             return;
         }
-        progressDialog.setMessage("Registering ...");
-        progressDialog.show();
-
-        firebaseAuth.createUserWithEmailAndPassword(EMAIL,PASSWORD)
+        progressBar.setVisibility(View.VISIBLE);
+        firebaseAuth.createUserWithEmailAndPassword(emailStr,passwordStr)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if(task.isSuccessful()){
                             mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child("email").setValue(EMAIL);
+                                    .child("email").setValue(emailStr);
 
                             mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .child("userName").setValue(UserName.getText().toString());
                             mDatabase.child("usersinfo").child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .child("userid").setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
+                            saveUserName(getActivity());
                             getActivity().finish();
                             startActivity(new Intent(getContext(),MainActivity.class));
                         }else{
                             FirebaseAuthException e = (FirebaseAuthException)task.getException();
-                            progressDialog.hide();
+                            progressBar.setVisibility(View.GONE);
                             return;
                         }
                     }

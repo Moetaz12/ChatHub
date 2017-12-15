@@ -4,10 +4,10 @@
 
      <item android:id="@+id/profile" android:title="Profile"
          android:icon="@drawable/profile_icon"/>
-        <item android:id="@+id/fav" android:title="Foavourite Friends"
+        <item android:id="@+id/fav" android:title="Favourite Friends"
             android:icon="@drawable/fav_icon"/>
         <item android:id="@+id/about" android:title="About"
-            android:icon="@drawable/fav_icon"/>
+            android:icon="@drawable/about_icon"/>
         <item android:id="@+id/logoutnav" android:title="Log Out"
             android:icon="@drawable/logout"/>
 

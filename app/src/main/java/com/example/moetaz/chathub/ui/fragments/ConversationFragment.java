@@ -1,6 +1,8 @@
 package com.example.moetaz.chathub.ui.fragments;
 
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -24,7 +26,9 @@ import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.messagesInfo;
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.database.DataSnapshot;
@@ -42,6 +46,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.example.moetaz.chathub.provider.ConvProivderConstants.CONTENT_URI_1;
+import static com.example.moetaz.chathub.provider.ConvProivderConstants.MESSAGE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 import static com.example.moetaz.chathub.help.FirebaseConstants.MESSAGESINFO_NODE;
@@ -55,18 +61,18 @@ import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 public class ConversationFragment extends Fragment {
     @BindView(R.id.app_bar)
     Toolbar toolbar;
-    Firebase mRef;
+    private Firebase mRef,mCovRef;
     @BindView(R.id.msg)
     EditText mesgToSend;
     @BindView(R.id.send_img)
     ImageView img;
     @BindView(R.id.conv_list)
-    RecyclerView UsersList;
-    String friendId;
-    String friendUserName;
+    RecyclerView usersList;
+    private String friendId;
+    private String friendUserName;
     private DatabaseReference mDatabase;
     private StorageReference storageReference;
-    ;
+    private ContentResolver contentResolver;
 
     public ConversationFragment() {
         // Required empty public constructor
@@ -75,10 +81,10 @@ public class ConversationFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        contentResolver = getActivity().getContentResolver();
         Intent intent = getActivity().getIntent();
 
-        if (Utilities.IsTablet(getContext())) {
+        if (Utilities.isTablet(getContext())) {
             friendId = getArguments().getString(getString(R.string.friend_id_envelope));
             friendUserName = getArguments().getString(getString(R.string.friend_username_envelope));
 
@@ -98,12 +104,14 @@ public class ConversationFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_conversation, container, false);
         ButterKnife.bind(this, view);
         mRef = new Firebase(FB_ROOT);
+        mCovRef = new Firebase(FB_ROOT+"/"+Utilities.getUserId()+"/"+CONVERSATIONINFO_NODE
+                +"/"+friendId+"/"+MESSAGESINFO_NODE);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
                 .child(CONVERSATIONINFO_NODE).child(friendId).child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
-        UsersList.setHasFixedSize(true);
-        UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        usersList.setHasFixedSize(true);
+        usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         final FirebaseRecyclerAdapter<messagesInfo, ConversationFragment.UserHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<messagesInfo, ConversationFragment.UserHolder>(
@@ -127,23 +135,23 @@ public class ConversationFragment extends Fragment {
                     }
                 };
 
-        UsersList.setAdapter(firebaseRecyclerAdapter);
+        usersList.setAdapter(firebaseRecyclerAdapter);
         img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String Msg = mesgToSend.getText().toString();
+                String msg = mesgToSend.getText().toString();
 
                 String CurrentTime = getCurrentTime();
                 mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(Msg));
+                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
                 mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext()).GetItem("UserName"));
 
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(Msg));
+                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
                         .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext()).GetItem("UserName"));
@@ -155,10 +163,10 @@ public class ConversationFragment extends Fragment {
                 }
             }
         });
-        UsersList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        usersList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                UsersList.scrollToPosition(UsersList.getAdapter().getItemCount() - 1);
+                usersList.scrollToPosition(usersList.getAdapter().getItemCount() - 1);
             }
         });
         return view;
@@ -216,7 +224,7 @@ public class ConversationFragment extends Fragment {
         switch (id) {
             case android.R.id.home:
                 getActivity().finish();
-                //startActivity(new Intent(getContext(), MainActivity.class));
+
                 break;
             case R.id.fav_list_action:
                 mRef.child(Utilities.getUserId()).child("FavList").child(friendId)
@@ -226,10 +234,54 @@ public class ConversationFragment extends Fragment {
                         .child("favUserName")
                         .setValue(friendUserName);
                 break;
+            case R.id.addwidget:addToWidget();break;
+            case R.id.deleteconversation: mCovRef.removeValue();
             default:
                 break;
         }
         return true;
+    }
+
+    private void addToWidget() {
+        new SharedPref(getContext()).SaveItem("userWidget",friendUserName);
+        contentResolver.delete(CONTENT_URI_1,
+                null, null);
+        final ContentValues cv = new ContentValues();
+        mCovRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(com.firebase.client.DataSnapshot dataSnapshot, String s) {
+                String sender = dataSnapshot.child("sender").getValue(String.class);
+                if (sender.equals(Utilities.getUserName(getContext()))) {
+                    sender = "me";
+                }
+                String msg = dataSnapshot.child("msg").getValue(String.class);
+                String finalString = sender+" : "+msg;
+                cv.put(MESSAGE,finalString);
+                  contentResolver.insert(CONTENT_URI_1,cv);
+            }
+
+            @Override
+            public void onChildChanged(com.firebase.client.DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(com.firebase.client.DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(com.firebase.client.DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+
     }
 
     @Override
@@ -240,7 +292,7 @@ public class ConversationFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (!Utilities.IsTablet(getContext())) {
+        if (!Utilities.isTablet(getContext())) {
             try {
 
                 ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);

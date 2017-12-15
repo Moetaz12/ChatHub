@@ -9,8 +9,10 @@
         android:roundIcon="@drawable/ic_launcher_logo"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+
         <activity android:name=".ui.activities.MainActivity" />
-        <activity android:name=".ui.activities.RegiteringActivity"></activity>
+        <activity android:name=".ui.activities.RegiteringActivity" />
         <activity android:name=".ui.activities.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,7 +27,28 @@
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".ui.activities.ProfileActivity" />
         <activity android:name=".ui.activities.FavouriteListActivity" />
-        <activity android:name=".ui.activities.AboutActivity"></activity>
+        <activity android:name=".ui.activities.AboutActivity" />
+
+        <provider
+            android:name=".provider.ConvProvider"
+            android:authorities="com.example.moetaz.chathub"
+            android:exported="true"> </provider>
+
+        <receiver android:name=".widget.ConvWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/conv_widget_info" />
+        </receiver>
+
+        <service android:name=".widget.WidgetService"
+            android:exported="true"
+            android:permission="android.permission.BIND_REMOTEVIEWS"
+            />
+
     </application>
 
 </manifest>

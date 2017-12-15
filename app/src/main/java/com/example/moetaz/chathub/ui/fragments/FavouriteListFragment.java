@@ -65,8 +65,9 @@ public class FavouriteListFragment extends Fragment {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 String value = dataSnapshot.child("favUserName").getValue(String.class);
+                String value2 = dataSnapshot.child("favId").getValue(String.class);
                 FavFriend favFriend = new FavFriend();
-                favFriend.setId("cdlc");
+                favFriend.setId(value2);
                 favFriend.setUserName(value);
                 favFriendList.add(favFriend);
                 favAdapter.notifyItemInserted(favFriendList.size()-1);
