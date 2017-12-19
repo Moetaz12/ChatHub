@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.help.Utilities;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,7 +28,11 @@ public class AboutActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_about);
         textView = findViewById(R.id.about_app);
-        new MyAsyncTask(url).execute();
+        if (Utilities.isNetworkConnected(getApplicationContext())) {
+            new MyAsyncTask(url).execute();
+        } else {
+            Utilities.message(getApplicationContext(),getString(R.string.checking_internet_msg));
+        }
 
     }
 

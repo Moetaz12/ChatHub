@@ -119,8 +119,6 @@ public class MainFragment extends Fragment {
         usersList.setHasFixedSize(true);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         setDrawerLayoutHeight();
-
-        if (Utilities.isNetworkConnected(getContext())) {
             final FirebaseRecyclerAdapter<messagesInfo, UserHolder> firebaseRecyclerAdapter =
                     new FirebaseRecyclerAdapter<messagesInfo, UserHolder>(
                             messagesInfo.class
@@ -179,9 +177,7 @@ public class MainFragment extends Fragment {
                     };
 
             usersList.setAdapter(firebaseRecyclerAdapter);
-        } else {
-            Utilities.message(getContext(), getString(R.string.checking_internet_msg));
-        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
