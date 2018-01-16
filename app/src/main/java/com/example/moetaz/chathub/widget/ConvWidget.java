@@ -10,7 +10,7 @@ import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 
 /**
- * Implementation of App Widget functionality.
+ * Implementation of app Widget functionality.
  */
 public class ConvWidget extends AppWidgetProvider {
 
