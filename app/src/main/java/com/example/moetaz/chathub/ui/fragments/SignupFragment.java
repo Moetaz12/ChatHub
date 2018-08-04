@@ -113,6 +113,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                                     .child(PROFILE_PIC).setValue("");
 
                             saveUserName(getActivity());
+                            Utilities.saveProfilePicUrl(getActivity());
                             getActivity().finish();
                             startActivity(new Intent(getContext(), MainActivity.class));
                         } else {

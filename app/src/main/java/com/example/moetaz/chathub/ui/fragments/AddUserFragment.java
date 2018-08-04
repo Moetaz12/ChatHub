@@ -42,6 +42,7 @@ import butterknife.ButterKnife;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FRIEND_PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.NAME_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
@@ -104,7 +105,8 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                             @Override
                             public void onClick(View v) {
                                 fConvInfo = new Firebase(FB_ROOT);
-                                launchConvFragment(ComKey, model.getUserName());
+                                launchConvFragment(ComKey, model.getUserName()
+                                        ,model.getProfilePic());
 
                             }
                         });
@@ -137,11 +139,19 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         return view;
     }
 
-    private void launchConvFragment(String friendId, String friendUsername) {
+    private void launchConvFragment(String friendId, String friendUsername
+            ,String profilePic) {
         fConvInfo.child(currentUserId).child(CONVERSATIONINFO_NODE).child(friendId)
                 .child(NAME_NODE).setValue(friendUsername);
+
         fConvInfo.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                 .child(NAME_NODE).setValue(new SharedPref(getContext()).GetItem(getString(R.string.usrename_pref)));
+
+        fConvInfo.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
+                .child(FRIEND_PROFILE_PIC).setValue(new SharedPref(getContext()).GetItem("profilepickey"));
+
+        fConvInfo.child(currentUserId).child(CONVERSATIONINFO_NODE).child(friendId)
+                .child(FRIEND_PROFILE_PIC).setValue(profilePic);
 
         if (Utilities.isTablet(getContext())) {
             ConversationFragment conversationFragment = new ConversationFragment();
@@ -193,7 +203,8 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
                         viewHolder.mView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                launchConvFragment(ComKey, model.getUserName());
+                                launchConvFragment(ComKey, model.getUserName()
+                                        ,model.getProfilePic());
                             }
                         });
                     }

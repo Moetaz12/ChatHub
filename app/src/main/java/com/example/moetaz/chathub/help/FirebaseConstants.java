@@ -20,4 +20,5 @@ public class FirebaseConstants {
     public static final String FAVUSERNAME = "favUserName";
     public static final String USERID_NODE = "userid";
     public static final String PROFILE_PIC = "profilePic";
+    public static final String FRIEND_PROFILE_PIC = "friendprofilePic";
 }

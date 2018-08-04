@@ -18,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.ui.activities.MainActivity;
 import com.firebase.client.Firebase;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -100,6 +101,7 @@ public class LoginFragment extends Fragment implements View.OnClickListener {
                         progressBar.setVisibility(View.INVISIBLE);
                         if (task.isSuccessful()) {
                             saveUserName(getActivity());
+                            Utilities.saveProfilePicUrl(getActivity());
                             getActivity().finish();
                             startActivity(new Intent(getContext(), MainActivity.class));
                         } else {

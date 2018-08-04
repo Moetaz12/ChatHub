@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -26,17 +27,17 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.adapters.MainAdapter;
 import com.example.moetaz.chathub.help.Utilities;
-import com.example.moetaz.chathub.models.messagesInfo;
+import com.example.moetaz.chathub.models.User;
 import com.example.moetaz.chathub.ui.activities.AboutActivity;
 import com.example.moetaz.chathub.ui.activities.AddUserActivity;
-import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 import com.example.moetaz.chathub.ui.activities.FavouriteListActivity;
 import com.example.moetaz.chathub.ui.activities.ProfileActivity;
 import com.example.moetaz.chathub.ui.activities.RegiteringActivity;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -45,13 +46,18 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.FRIEND_PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
+import static com.example.moetaz.chathub.help.FirebaseConstants.NAME_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
-import static com.example.moetaz.chathub.help.Utilities.isTablet;
 
 
 /**
@@ -74,7 +80,9 @@ public class MainFragment extends Fragment {
     private DatabaseReference mDatabase;
     private StorageReference storageReference;
     ;
-
+    private MainAdapter adapter;
+    private GridLayoutManager gridLayoutManager;
+    private List<User> users = new ArrayList<>();
     public MainFragment() {
         // Required empty public constructor
     }
@@ -98,76 +106,21 @@ public class MainFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_main, container, false);
         ButterKnife.bind(this, view);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) Objects.requireNonNull(getActivity())).setSupportActionBar(toolbar);
         actionBarDrawerToggle = new ActionBarDrawerToggle(getActivity(), drawerLayout, toolbar, R.string.open, R.string.colse);
 
         setListnerToDrawer();
         setListnerToNavigationViewItems();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
+        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
+                .child(Utilities.getUserId())
                 .child(CONVERSATIONINFO_NODE);
 
         usersList.setHasFixedSize(true);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
         setDrawerLayoutHeight();
-            final FirebaseRecyclerAdapter<messagesInfo, UserHolder> firebaseRecyclerAdapter =
-                    new FirebaseRecyclerAdapter<messagesInfo, UserHolder>(
-                            messagesInfo.class
-                            , R.layout.main_list_row
-                            , UserHolder.class
-                            , mDatabase
-                    ) {
-                        @Override
-                        protected void populateViewHolder(final UserHolder viewHolder, final messagesInfo model, final int position) {
 
-                            DatabaseReference ComRef = getRef(position);
-                            final String ComKey = ComRef.getKey();
-                            viewHolder.name.setText(model.getName());
-                            viewHolder.mView.setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    if (isTablet(getContext())) {
-                                        ConversationFragment conversationFragment = new ConversationFragment();
-                                        Bundle bundle = new Bundle();
-                                        bundle.putString(getString(R.string.friend_id_envelope), ComKey);
-                                        bundle.putString(getString(R.string.friend_username_envelope), model.getName());
-                                        conversationFragment.setArguments(bundle);
-                                        getActivity().getSupportFragmentManager().beginTransaction()
-                                                .replace(R.id.fconv, conversationFragment).commit();
-
-                                    } else {
-                                        Intent intent = new Intent(getContext(), ConversationActivity.class);
-                                        intent.putExtra(getString(R.string.friend_id_envelope), ComKey);
-                                        intent.putExtra(getString(R.string.friend_username_envelope), model.getName());
-                                        getActivity().startActivity(intent);
-                                    }
-                                }
-                            });
-
-                            DatabaseReference DatabaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
-                                    .child(ComKey);
-                            DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    StorageReference filepath = storageReference
-                                            .child(getString(R.string.picsFolderFirebase) + ComKey + getString(R.string.jpgExt));
-                                    if (dataSnapshot.hasChild(HASPROFILEPIC)) {
-                                        Glide.with(getActivity()).using(new FirebaseImageLoader())
-                                                .load(filepath).into(viewHolder.imageView);
-                                    } else {
-
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
-                        }
-                    };
-
-            usersList.setAdapter(firebaseRecyclerAdapter);
+        initList();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -177,6 +130,45 @@ public class MainFragment extends Fragment {
         });
 
         return view;
+    }
+
+    private void initList() {
+        adapter = new MainAdapter(getContext(),users);
+        usersList.setAdapter(adapter);
+        mDatabase.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                String name = dataSnapshot.child(NAME_NODE).getValue(String.class);
+                String imageurl = dataSnapshot.child(FRIEND_PROFILE_PIC).getValue(String.class);
+                String key = dataSnapshot.getKey();
+                User user = new User();
+                user.setName(name);
+                user.setImgeUrl(imageurl);
+                user.setKey(key);
+                users.add(user);
+                adapter.notifyItemInserted(users.size() - 1);
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     @Override
@@ -265,20 +257,13 @@ public class MainFragment extends Fragment {
         startActivity(new Intent(getActivity(), RegiteringActivity.class));
     }
 
-    public static class UserHolder extends RecyclerView.ViewHolder {
 
-        ImageView imageView;
-        TextView name;
-        View mView;
 
-        public UserHolder(View itemView) {
-            super(itemView);
 
-            name = itemView.findViewById(R.id.username);
-            imageView = itemView.findViewById(R.id.userimg);
-            mView = itemView;
-        }
+    private void SetGridManager() {
+        gridLayoutManager = new GridLayoutManager(getActivity(), 1);
 
+        usersList.setLayoutManager(gridLayoutManager);
     }
 
 

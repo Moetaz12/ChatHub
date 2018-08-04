@@ -25,6 +25,7 @@ import com.bumptech.glide.Glide;
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
+import com.example.moetaz.chathub.models.User;
 import com.example.moetaz.chathub.models.messagesInfo;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
@@ -76,6 +77,7 @@ public class ConversationFragment extends Fragment {
     private DatabaseReference mDatabase;
     private StorageReference storageReference;
     private ContentResolver contentResolver;
+    private User user;
 
     public ConversationFragment() {
         // Required empty public constructor
@@ -96,12 +98,18 @@ public class ConversationFragment extends Fragment {
         Intent intent = getActivity().getIntent();
 
         if (Utilities.isTablet(getContext())) {
-            friendId = getArguments().getString(getString(R.string.friend_id_envelope));
-            friendUserName = getArguments().getString(getString(R.string.friend_username_envelope));
+            if (getArguments() != null) {
+                user = getArguments().getParcelable("userkey");
+                friendId = user.getKey();
+                friendUserName = user.getName();
+            }
 
         } else {
-            friendId = intent.getExtras().getString(getString(R.string.friend_id_envelope));
-            friendUserName = intent.getExtras().getString(getString(R.string.friend_username_envelope));
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                user = intent.getExtras().getParcelable("userkey");
+                friendId = user.getKey();
+                friendUserName = user.getName();
+            }
         }
 
         getActivity().setTitle(friendUserName);
@@ -118,8 +126,11 @@ public class ConversationFragment extends Fragment {
         mCovRef = new Firebase(FB_ROOT + "/" + Utilities.getUserId() + "/" + CONVERSATIONINFO_NODE
                 + "/" + friendId + "/" + MESSAGESINFO_NODE);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
-                .child(CONVERSATIONINFO_NODE).child(friendId).child(MESSAGESINFO_NODE);
+        mDatabase = FirebaseDatabase.getInstance().getReference()
+                .child(USERINFO_NODE).child(Utilities.getUserId())
+                .child(CONVERSATIONINFO_NODE)
+                .child(friendId)
+                .child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
         usersList.setHasFixedSize(true);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));

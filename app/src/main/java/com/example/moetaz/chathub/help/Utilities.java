@@ -13,6 +13,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.firebase.auth.FirebaseAuth;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
+import static com.example.moetaz.chathub.help.FirebaseConstants.PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
 /**
@@ -39,6 +40,25 @@ public class Utilities {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 name[0] = (String) dataSnapshot.getValue();
                 new SharedPref(context).SaveItem(context.getString(R.string.usrename_pref), name[0]);
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+
+            }
+        });
+
+    }
+
+    public static void saveProfilePicUrl(final Context context) {
+        final String[] name = new String[1];
+        Firebase mUsers;
+        mUsers = new Firebase(FB_ROOT + getUserId());
+        mUsers.child(PROFILE_PIC).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                name[0] = (String) dataSnapshot.getValue();
+                new SharedPref(context).SaveItem("profilepickey", name[0]);
             }
 
             @Override

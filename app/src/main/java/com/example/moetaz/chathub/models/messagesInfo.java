@@ -9,16 +9,18 @@ public class messagesInfo {
     private String msg;
     private String sender;
     private String userName;
+    private String profilePic;
 
     public messagesInfo() {
 
     }
 
-    public messagesInfo(String name, String msg, String sender, String userName) {
+    public messagesInfo(String name, String msg, String sender, String userName,String profilePic) {
         this.name = name;
         this.msg = msg;
         this.sender = sender;
         this.userName = userName;
+        this.profilePic = profilePic;
     }
 
     public String getName() {
@@ -55,5 +57,14 @@ public class messagesInfo {
     public void setUserName(String userName) {
 
         this.userName = userName;
+    }
+
+    public void setProfilePic(String profilePic) {
+        this.profilePic = profilePic;
+    }
+
+    public String getProfilePic() {
+
+        return profilePic;
     }
 }

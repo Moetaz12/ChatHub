@@ -37,6 +37,7 @@ import butterknife.ButterKnife;
 import static com.example.moetaz.chathub.help.FirebaseConstants.EMAIL_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
+import static com.example.moetaz.chathub.help.FirebaseConstants.PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
@@ -46,7 +47,7 @@ public class ProfileActivity extends AppCompatActivity {
     Firebase mCheck;
     TextView textViewEmail, textViewUsername;
     ProgressDialog progressDialog;
-    DatabaseReference DatabaseRef;
+    DatabaseReference databaseRef;
     private StorageReference storageReference;
     private Toolbar toolbar;
 
@@ -74,9 +75,9 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-        DatabaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
+        databaseRef = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
                 .child(Utilities.getUserId());
-        DatabaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
@@ -101,7 +102,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     private void setNameInfo() {
 
-        DatabaseRef.child(USERNAME_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.child(USERNAME_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 textViewUsername.setText(dataSnapshot.getValue(String.class));
@@ -115,7 +116,7 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void setEmailInfo() {
-        DatabaseRef.child(EMAIL_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseRef.child(EMAIL_NODE).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 textViewEmail.setText(dataSnapshot.getValue(String.class));
@@ -152,7 +153,11 @@ public class ProfileActivity extends AppCompatActivity {
                     childRef3.setValue("1");
                     progressDialog.dismiss();
                     Uri downloadurl = taskSnapshot.getDownloadUrl();
-                    Picasso.with(getApplicationContext()).load(downloadurl).into(imageView);
+                    if (downloadurl != null) {
+                        Picasso.with(getApplicationContext()).load(downloadurl).into(imageView);
+                        databaseRef.child(PROFILE_PIC).setValue(downloadurl.toString());
+                        Utilities.saveProfilePicUrl(getApplicationContext());
+                    }
 
 
                 }
