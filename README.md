@@ -1,1 +1,1 @@
-# ChatHub
+# ChatHub App
