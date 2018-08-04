@@ -33,7 +33,7 @@
         <provider
             android:name=".provider.ConvProvider"
             android:authorities="com.example.moetaz.chathub"
-            android:exported="true"></provider>
+            android:exported="true"/>
 
         <receiver android:name=".widget.ConvWidget">
             <intent-filter>

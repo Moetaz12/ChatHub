@@ -34,12 +34,8 @@ import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 import com.example.moetaz.chathub.ui.activities.FavouriteListActivity;
 import com.example.moetaz.chathub.ui.activities.ProfileActivity;
 import com.example.moetaz.chathub.ui.activities.RegiteringActivity;
-import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.MobileAds;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -86,8 +82,7 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        MobileAds.initialize(getContext(), getString(R.string.admob_projectId));
-        Firebase.setAndroidContext(getContext());
+
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             getActivity().finish();
@@ -108,10 +103,6 @@ public class MainFragment extends Fragment {
 
         setListnerToDrawer();
         setListnerToNavigationViewItems();
-
-        AdView mAdView = view.findViewById(R.id.adView);
-        AdRequest adRequest = new AdRequest.Builder().build();
-        mAdView.loadAd(adRequest);
 
         mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE).child(Utilities.getUserId())
                 .child(CONVERSATIONINFO_NODE);

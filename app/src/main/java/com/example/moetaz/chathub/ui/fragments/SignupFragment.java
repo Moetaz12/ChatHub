@@ -16,8 +16,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.ui.activities.MainActivity;
-import com.firebase.client.Firebase;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -30,6 +30,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.EMAIL_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERID_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
@@ -68,7 +69,6 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
         ;
         ButterKnife.bind(this, view);
         firebaseAuth = FirebaseAuth.getInstance();
-        Firebase.setAndroidContext(getContext());
         mDatabase = FirebaseDatabase.getInstance().getReference();
         progressBar.setVisibility(View.GONE);
         if (firebaseAuth.getCurrentUser() != null) {
@@ -105,8 +105,13 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
                             mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .child(USERNAME_NODE).setValue(UserName.getText().toString());
+
                             mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                                     .child(USERID_NODE).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                                    .child(PROFILE_PIC).setValue("");
+
                             saveUserName(getActivity());
                             getActivity().finish();
                             startActivity(new Intent(getContext(), MainActivity.class));
@@ -124,7 +129,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         if (view == Regiter) {
-            RegiterUser();
+            try {
+                RegiterUser();
+            } catch (Exception e) {
+                Utilities.message(getContext(),"Enter valid data");
+            }
         }
         if (view == signin) {
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.fregiter, new LoginFragment())

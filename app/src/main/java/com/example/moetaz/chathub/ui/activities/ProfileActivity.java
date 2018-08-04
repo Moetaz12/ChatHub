@@ -32,6 +32,8 @@ import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
 
+import butterknife.ButterKnife;
+
 import static com.example.moetaz.chathub.help.FirebaseConstants.EMAIL_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
@@ -52,6 +54,7 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
+        ButterKnife.bind(this);
         progressDialog = new ProgressDialog(this);
         toolbar = findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
@@ -139,17 +142,19 @@ public class ProfileActivity extends AppCompatActivity {
             byte[] bData = baos.toByteArray();
             imageView.setImageBitmap(bitmap);
 
-            StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
+            final StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
                     + Utilities.getUserId() + getString(R.string.jpgExt));
             filepath.putBytes(bData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
                     Firebase childRef3 = mCheck.child(HASPROFILEPIC);
                     childRef3.setValue("1");
                     progressDialog.dismiss();
                     Uri downloadurl = taskSnapshot.getDownloadUrl();
                     Picasso.with(getApplicationContext()).load(downloadurl).into(imageView);
-                    //GlobalVariables.message(getActivity(), "Finished");
+
+
                 }
             }).addOnFailureListener(new OnFailureListener() {
                 @Override
