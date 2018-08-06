@@ -24,7 +24,7 @@ import com.bumptech.glide.Glide;
 import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
-import com.example.moetaz.chathub.models.messagesInfo;
+import com.example.moetaz.chathub.models.MessagesInfo;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -88,15 +88,15 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
-                new FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder>(
-                        messagesInfo.class
+        final FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
+                new FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder>(
+                        MessagesInfo.class
                         , R.layout.main_list_row
                         , AddUserFragment.UserHolder.class
                         , mDatabase
                 ) {
                     @Override
-                    protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
+                    protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final MessagesInfo model, final int position) {
 
                         DatabaseReference ComRef = getRef(position);
                         final String ComKey = ComRef.getKey();
@@ -187,15 +187,15 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        final FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
-                new FirebaseRecyclerAdapter<messagesInfo, AddUserFragment.UserHolder>(
-                        messagesInfo.class
+        final FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
+                new FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder>(
+                        MessagesInfo.class
                         , R.layout.main_list_row
                         , AddUserFragment.UserHolder.class
                         , mDatabase.orderByChild(USERNAME_NODE).equalTo(newText)
                 ) {
                     @Override
-                    protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
+                    protected void populateViewHolder(final AddUserFragment.UserHolder viewHolder, final MessagesInfo model, final int position) {
 
                         DatabaseReference ComRef = getRef(position);
                         final String ComKey = ComRef.getKey();

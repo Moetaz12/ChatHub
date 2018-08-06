@@ -18,8 +18,11 @@ import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.help.Utilities;
 import com.firebase.client.Firebase;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.android.gms.tasks.Continuation;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -145,6 +148,7 @@ public class ProfileActivity extends AppCompatActivity {
 
             final StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
                     + Utilities.getUserId() + getString(R.string.jpgExt));
+/*
             filepath.putBytes(bData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
@@ -152,7 +156,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Firebase childRef3 = mCheck.child(HASPROFILEPIC);
                     childRef3.setValue("1");
                     progressDialog.dismiss();
-                    Uri downloadurl = taskSnapshot.getDownloadUrl();
+                    Uri downloadurl = taskSnapshot.();
                     if (downloadurl != null) {
                         Picasso.with(getApplicationContext()).load(downloadurl).into(imageView);
                         databaseRef.child(PROFILE_PIC).setValue(downloadurl.toString());
@@ -165,6 +169,35 @@ public class ProfileActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(@NonNull Exception e) {
 
+                }
+            });*/
+
+
+            filepath.putBytes(bData).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
+                @Override
+                public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
+                    if (!task.isSuccessful()) {
+                        throw task.getException();
+                    }
+                    return filepath.getDownloadUrl();
+                }
+            }).addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    if (task.isSuccessful()) {
+                        Uri downloadUri = task.getResult();
+                        Firebase childRef3 = mCheck.child(HASPROFILEPIC);
+                        childRef3.setValue("1");
+                        progressDialog.dismiss();
+
+                        if (downloadUri != null) {
+                            Picasso.with(getApplicationContext()).load(downloadUri).into(imageView);
+                            databaseRef.child(PROFILE_PIC).setValue(downloadUri.toString());
+                            Utilities.saveProfilePicUrl(getApplicationContext());
+                        }
+                    } else {
+
+                    }
                 }
             });
         }

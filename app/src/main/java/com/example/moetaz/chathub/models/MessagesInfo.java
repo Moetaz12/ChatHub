@@ -4,18 +4,18 @@ package com.example.moetaz.chathub.models;
  * Created by Moetaz on 12/2/2017.
  */
 
-public class messagesInfo {
+public class MessagesInfo {
     private String name;
     private String msg;
     private String sender;
     private String userName;
     private String profilePic;
 
-    public messagesInfo() {
+    public MessagesInfo() {
 
     }
 
-    public messagesInfo(String name, String msg, String sender, String userName,String profilePic) {
+    public MessagesInfo(String name, String msg, String sender, String userName, String profilePic) {
         this.name = name;
         this.msg = msg;
         this.sender = sender;

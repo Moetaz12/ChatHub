@@ -5,6 +5,7 @@ import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -19,18 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.adapters.ConversationAdapter;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
+import com.example.moetaz.chathub.models.MessagesInfo;
 import com.example.moetaz.chathub.models.User;
-import com.example.moetaz.chathub.models.messagesInfo;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -41,11 +41,12 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import de.hdodenhof.circleimageview.CircleImageView;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FAVID_NODE;
@@ -68,9 +69,10 @@ public class ConversationFragment extends Fragment {
     @BindView(R.id.msg)
     EditText mesgToSend;
     @BindView(R.id.send_img)
-    ImageView img;
+    ImageView sendIcon;
     @BindView(R.id.conv_list)
-    RecyclerView usersList;
+    RecyclerView conversationList;
+    private List<MessagesInfo> messagesInfos = new ArrayList<>();
     private Firebase mRef, mCovRef,newRef;
     private String friendId;
     private String friendUserName;
@@ -78,6 +80,8 @@ public class ConversationFragment extends Fragment {
     private StorageReference storageReference;
     private ContentResolver contentResolver;
     private User user;
+    private ConversationAdapter adapter;
+    private com.google.firebase.database.ChildEventListener childEventListener;
 
     public ConversationFragment() {
         // Required empty public constructor
@@ -96,7 +100,7 @@ public class ConversationFragment extends Fragment {
         super.onCreate(savedInstanceState);
         contentResolver = getActivity().getContentResolver();
         Intent intent = getActivity().getIntent();
-
+        storageReference = FirebaseStorage.getInstance().getReference();
         if (Utilities.isTablet(getContext())) {
             if (getArguments() != null) {
                 user = getArguments().getParcelable("userkey");
@@ -113,7 +117,7 @@ public class ConversationFragment extends Fragment {
         }
 
         getActivity().setTitle(friendUserName);
-        storageReference = FirebaseStorage.getInstance().getReference();
+
     }
 
     @Override
@@ -127,73 +131,103 @@ public class ConversationFragment extends Fragment {
                 + "/" + friendId + "/" + MESSAGESINFO_NODE);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         mDatabase = FirebaseDatabase.getInstance().getReference()
-                .child(USERINFO_NODE).child(Utilities.getUserId())
+                .child(USERINFO_NODE)
+                .child(Utilities.getUserId())
                 .child(CONVERSATIONINFO_NODE)
                 .child(friendId)
                 .child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
-        usersList.setHasFixedSize(true);
-        usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        conversationList.setHasFixedSize(true);
+        conversationList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        initList();
 
-        final FirebaseRecyclerAdapter<messagesInfo, ConversationFragment.UserHolder> firebaseRecyclerAdapter =
-                new FirebaseRecyclerAdapter<messagesInfo, ConversationFragment.UserHolder>(
-                        messagesInfo.class
-                        , R.layout.conv_list_row
-                        , ConversationFragment.UserHolder.class
-                        , mDatabase
-                ) {
-                    @Override
-                    protected void populateViewHolder(final ConversationFragment.UserHolder viewHolder, final messagesInfo model, final int position) {
-
-
-                        viewHolder.message.setText(model.getMsg());
-                        if (model.getSender().equals(new SharedPref(getContext()).GetItem("UserName"))) {
-                            viewHolder.img2.setVisibility(View.INVISIBLE);
-                            setImage(Utilities.getUserId(), viewHolder.img1);
-                        } else {
-                            viewHolder.img1.setVisibility(View.INVISIBLE);
-                            setImage(friendId, viewHolder.img2);
-                        }
-                    }
-                };
-
-        usersList.setAdapter(firebaseRecyclerAdapter);
-        img.setOnClickListener(new View.OnClickListener() {
+        sendIcon.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String msg = mesgToSend.getText().toString();
 
                 String CurrentTime = getCurrentTime();
-                mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
-                        .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
-                mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
-                        .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext())
-                        .GetItem(getString(R.string.usrename_pref)));
+                    mDatabase.removeEventListener(childEventListener);
+                    mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
+                            .child(MESSAGESINFO_NODE)
+                            .child(CurrentTime).child(MESSAGE_NODE)
+                            .setValue(String.valueOf(msg));
+
+                    mRef.child(Utilities.getUserId()).child(CONVERSATIONINFO_NODE).child(friendId)
+                            .child(MESSAGESINFO_NODE)
+                            .child(CurrentTime).child(SENDER_NODE)
+                            .setValue(new SharedPref(getContext()).GetItem(getString(R.string.usrename_pref)));
+
 
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(MESSAGE_NODE).setValue(String.valueOf(msg));
+                        .child(CurrentTime).child(MESSAGE_NODE)
+                        .setValue(String.valueOf(msg));
+
                 mRef.child(friendId).child(CONVERSATIONINFO_NODE).child(Utilities.getUserId())
                         .child(MESSAGESINFO_NODE)
-                        .child(CurrentTime).child(SENDER_NODE).setValue(new SharedPref(getContext())
-                        .GetItem(getString(R.string.usrename_pref)));
+                        .child(CurrentTime).child(SENDER_NODE)
+                        .setValue(new SharedPref(getContext()).GetItem(getString(R.string.usrename_pref)));
+
                 mesgToSend.setText("");
-                try {
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
+
+                mDatabase.addChildEventListener(childEventListener);
             }
         });
-        usersList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+        conversationList.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
             @Override
             public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                usersList.scrollToPosition(usersList.getAdapter().getItemCount() - 1);
+                conversationList.scrollToPosition(conversationList.getAdapter().getItemCount() - 1);
             }
         });
         return view;
+    }
+
+    private void initList() {
+        adapter = new ConversationAdapter(getContext(),messagesInfos,user);
+        conversationList.setAdapter(adapter);
+
+        childEventListener = new
+                com.google.firebase.database.ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+                String message = dataSnapshot.child("msg").getValue(String.class);
+                String sender = dataSnapshot.child("sender").getValue(String.class);
+
+                if (message != null && sender != null) {
+                    MessagesInfo messagesInfo = new MessagesInfo();
+                    messagesInfo.setMsg(message);
+                    messagesInfo.setSender(sender);
+
+                    messagesInfos.add(messagesInfo);
+                    adapter.notifyItemInserted(messagesInfos.size() - 1);
+                }
+
+            }
+
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        };
+
+
     }
 
     private void setImage(final String id, final ImageView imageView) {
@@ -309,20 +343,17 @@ public class ConversationFragment extends Fragment {
         }
     }
 
-    public static class UserHolder extends RecyclerView.ViewHolder {
-        CircleImageView img1;
-        CircleImageView img2;
-        TextView message;
-
-        public UserHolder(View itemView) {
-            super(itemView);
-
-            message = (TextView) itemView.findViewById(R.id.user_msg);
-            img1 = itemView.findViewById(R.id.user_img1);
-            img2 = itemView.findViewById(R.id.user_img2);
-
-        }
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        mDatabase.addChildEventListener(childEventListener);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mDatabase.removeEventListener(childEventListener);
+    }
 }
+
+
