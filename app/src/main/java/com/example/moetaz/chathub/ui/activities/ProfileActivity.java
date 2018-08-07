@@ -20,8 +20,6 @@ import com.firebase.client.Firebase;
 import com.firebase.ui.storage.images.FirebaseImageLoader;
 import com.google.android.gms.tasks.Continuation;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -148,30 +146,6 @@ public class ProfileActivity extends AppCompatActivity {
 
             final StorageReference filepath = storageReference.child(getString(R.string.picsFolderFirebase)
                     + Utilities.getUserId() + getString(R.string.jpgExt));
-/*
-            filepath.putBytes(bData).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
-                    Firebase childRef3 = mCheck.child(HASPROFILEPIC);
-                    childRef3.setValue("1");
-                    progressDialog.dismiss();
-                    Uri downloadurl = taskSnapshot.();
-                    if (downloadurl != null) {
-                        Picasso.with(getApplicationContext()).load(downloadurl).into(imageView);
-                        databaseRef.child(PROFILE_PIC).setValue(downloadurl.toString());
-                        Utilities.saveProfilePicUrl(getApplicationContext());
-                    }
-
-
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-
-                }
-            });*/
-
 
             filepath.putBytes(bData).continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
                 @Override

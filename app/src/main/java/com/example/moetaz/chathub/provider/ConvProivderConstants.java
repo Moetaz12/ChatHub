@@ -10,7 +10,6 @@ public interface ConvProivderConstants {
 
     Uri CONTENT_URI_1 = Uri.parse
             ("content://com.example.moetaz.chathub/CONV_LIST");
-
     String MESSAGE = "message";
 
 }

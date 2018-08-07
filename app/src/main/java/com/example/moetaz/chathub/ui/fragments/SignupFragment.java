@@ -19,12 +19,17 @@ import com.example.moetaz.chathub.R;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.ui.activities.MainActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -42,11 +47,11 @@ import static com.example.moetaz.chathub.help.Utilities.saveUserName;
 public class SignupFragment extends Fragment implements View.OnClickListener {
 
     @BindView(R.id.buRegister)
-    Button Regiter;
+    Button regiter;
     @BindView(R.id.email)
     EditText email;
     @BindView(R.id.user_name)
-    EditText UserName;
+    EditText username;
     @BindView(R.id.password)
     EditText password;
     @BindView(R.id.login)
@@ -77,7 +82,7 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
         }
 
-        Regiter.setOnClickListener(this);
+        regiter.setOnClickListener(this);
         signin.setOnClickListener(this);
         return view;
     }
@@ -100,22 +105,11 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child(EMAIL_NODE).setValue(emailStr);
-
-                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child(USERNAME_NODE).setValue(UserName.getText().toString());
-
-                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child(USERID_NODE).setValue(FirebaseAuth.getInstance().getCurrentUser().getUid());
-
-                            mDatabase.child(USERINFO_NODE).child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                                    .child(PROFILE_PIC).setValue("");
-
+                            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                            initializeFirebasedatabaseVariables(emailStr);
                             saveUserName(getActivity());
                             Utilities.saveProfilePicUrl(getActivity());
-                            getActivity().finish();
-                            startActivity(new Intent(getContext(), MainActivity.class));
+                            updateProfileAndLaunch(user);
                         } else {
                             FirebaseAuthException e = (FirebaseAuthException) task.getException();
                             progressBar.setVisibility(View.GONE);
@@ -126,10 +120,54 @@ public class SignupFragment extends Fragment implements View.OnClickListener {
 
     }
 
+    private void initializeFirebasedatabaseVariables(String emailStr) {
+        String userId = Objects.requireNonNull(FirebaseAuth.getInstance().getCurrentUser()).getUid();
+        mDatabase.child(USERINFO_NODE).child(userId)
+                .child(EMAIL_NODE).setValue(emailStr);
+
+        mDatabase.child(USERINFO_NODE).child(userId)
+                .child(USERNAME_NODE).setValue(username.getText().toString());
+
+        mDatabase.child(USERINFO_NODE).child(userId)
+                .child(USERID_NODE).setValue(userId);
+
+        mDatabase.child(USERINFO_NODE).child(userId)
+                .child(PROFILE_PIC).setValue("");
+
+    }
+
+    private void updateProfileAndLaunch(FirebaseUser user) {
+        UserProfileChangeRequest userProfileChangeRequest = new UserProfileChangeRequest.Builder()
+                .setDisplayName(username.getText().toString())
+                .build();
+
+        user.updateProfile(userProfileChangeRequest)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+
+                        if (task.isSuccessful()){
+                            getActivity().finish();
+                            startActivity(new Intent(getContext(), MainActivity.class));
+                        }else {
+                            Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Toast.makeText(getContext(), "Something went wrong", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+    }
+
+
 
     @Override
     public void onClick(View view) {
-        if (view == Regiter) {
+        if (view == regiter) {
             try {
                 RegiterUser();
             } catch (Exception e) {

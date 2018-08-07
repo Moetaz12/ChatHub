@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,12 +29,14 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.mikepenz.materialdrawer.AccountHeader;
+import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.DividerDrawerItem;
 import com.mikepenz.materialdrawer.model.PrimaryDrawerItem;
-import com.mikepenz.materialdrawer.model.SecondaryDrawerItem;
+import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
+import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,6 @@ public class MainFragment extends Fragment {
     RecyclerView usersList;
     @BindView(R.id.add_fab)
     FloatingActionButton fab;
-    private ActionBarDrawerToggle actionBarDrawerToggle;
     private DatabaseReference mDatabase;
     private StorageReference storageReference;
     private MainAdapter adapter;
@@ -76,13 +76,15 @@ public class MainFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        storageReference = FirebaseStorage.getInstance().getReference();
+        mDatabase = FirebaseDatabase.getInstance().getReference();
 
         firebaseAuth = FirebaseAuth.getInstance();
         if (firebaseAuth.getCurrentUser() == null) {
             getActivity().finish();
             startActivity(new Intent(getActivity(), RegiteringActivity.class));
         }
-        storageReference = FirebaseStorage.getInstance().getReference();
+
 
     }
 
@@ -94,13 +96,8 @@ public class MainFragment extends Fragment {
         ButterKnife.bind(this, view);
         setNavigationDrawer();
 
-        mDatabase = FirebaseDatabase.getInstance().getReference().child(USERINFO_NODE)
-                .child(Utilities.getUserId())
-                .child(CONVERSATIONINFO_NODE);
-
         usersList.setHasFixedSize(true);
         usersList.setLayoutManager(new LinearLayoutManager(getActivity()));
-
 
         initList();
 
@@ -114,33 +111,16 @@ public class MainFragment extends Fragment {
         return view;
     }
 
-    private void setNavigationDrawer() {
-        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).withName("sck");
-        SecondaryDrawerItem item2 = new SecondaryDrawerItem().withIdentifier(2).withName("nlnc");
-
-
-        Drawer result = new DrawerBuilder()
-                .withActivity(Objects.requireNonNull(getActivity()))
-                .withToolbar(toolbar)
-                .addDrawerItems(
-                        item1,
-                        new DividerDrawerItem(),
-                        item2,
-                        new SecondaryDrawerItem().withName("mkmd")
-                )
-                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
-                         return false;
-                    }
-                })
-                .build();
-    }
 
     private void initList() {
+
         adapter = new MainAdapter(getContext(),users);
         usersList.setAdapter(adapter);
-        mDatabase.addChildEventListener(new ChildEventListener() {
+
+        mDatabase.child(USERINFO_NODE)
+                .child(Utilities.getUserId())
+                .child(CONVERSATIONINFO_NODE)
+                .addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
                 String name = dataSnapshot.child(NAME_NODE).getValue(String.class);
@@ -211,33 +191,6 @@ public class MainFragment extends Fragment {
     }
 
 
-   /* private void setListnerToNavigationViewItems() {
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(MenuItem item) {
-                switch (item.getItemId()) {
-                    case R.id.logoutnav:
-                        logOut();
-                        break;
-                    case R.id.profile:
-                        drawerLayout.closeDrawer(Gravity.START);
-                        startActivity(new Intent(getActivity(), ProfileActivity.class));
-                        break;
-                    case R.id.fav:
-                        drawerLayout.closeDrawer(Gravity.START);
-                        startActivity(new Intent(getActivity(), FavouriteListActivity.class));
-                        break;
-                    case R.id.about:
-                        startActivity(new Intent(getActivity(), AboutActivity.class));
-                        break;
-                    default:
-                        break;
-                }
-                return true;
-            }
-        });
-    }*/
-
 
 
     private void logOut() {
@@ -254,6 +207,52 @@ public class MainFragment extends Fragment {
 
         usersList.setLayoutManager(gridLayoutManager);
     }
+
+    private void setNavigationDrawer() {
+
+        AccountHeader headerResult = new AccountHeaderBuilder()
+                .withActivity(Objects.requireNonNull(getActivity()))
+                .withHeaderBackground(R.drawable.header_background)
+                .addProfiles(
+                        new ProfileDrawerItem().withName(firebaseAuth.getCurrentUser().getDisplayName())
+                                .withEmail("mikepenz@gmail.com")
+                                .withIcon(getResources().getDrawable(R.drawable.avatar))
+                )
+                .withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener() {
+                    @Override
+                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile) {
+                        return false;
+                    }
+                })
+                .build();
+
+        PrimaryDrawerItem item1 = new PrimaryDrawerItem()
+                .withIcon(R.drawable.logout).withIdentifier(1).withName("Profile");
+        PrimaryDrawerItem item2 = new PrimaryDrawerItem()
+                .withIcon(R.drawable.logout).withIdentifier(2).withName("Logout");
+
+
+        Drawer result = new DrawerBuilder()
+                .withAccountHeader(headerResult)
+                .withActivity(Objects.requireNonNull(getActivity()))
+                .withToolbar(toolbar)
+                .addDrawerItems(
+                        item1,
+                        item2
+                )
+                .withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener() {
+                    @Override
+                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem) {
+                        switch (position){
+                            case 2:logOut();break;
+                        }
+                        return true;
+                    }
+                })
+                .build();
+    }
+
+
 
 
 }

@@ -3,6 +3,7 @@ package com.example.moetaz.chathub.ui.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.MenuItemCompat;
@@ -20,31 +21,34 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
 import com.example.moetaz.chathub.R;
+import com.example.moetaz.chathub.adapters.MainAdapter;
 import com.example.moetaz.chathub.dataStorage.SharedPref;
 import com.example.moetaz.chathub.help.Utilities;
 import com.example.moetaz.chathub.models.MessagesInfo;
+import com.example.moetaz.chathub.models.User;
 import com.example.moetaz.chathub.ui.activities.ConversationActivity;
 import com.firebase.client.Firebase;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.firebase.ui.storage.images.FirebaseImageLoader;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.example.moetaz.chathub.help.FirebaseConstants.CONVERSATIONINFO_NODE;
-import static com.example.moetaz.chathub.help.FirebaseConstants.FB_ROOT;
 import static com.example.moetaz.chathub.help.FirebaseConstants.FRIEND_PROFILE_PIC;
-import static com.example.moetaz.chathub.help.FirebaseConstants.HASPROFILEPIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.NAME_NODE;
+import static com.example.moetaz.chathub.help.FirebaseConstants.PROFILE_PIC;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERINFO_NODE;
 import static com.example.moetaz.chathub.help.FirebaseConstants.USERNAME_NODE;
 
@@ -56,11 +60,14 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
     RecyclerView UsersList;
     @BindView(R.id.app_bar)
     Toolbar toolbar;
-    StorageReference storageReference;
+    private StorageReference storageReference;
     private Firebase fConvInfo;
     private DatabaseReference mDatabase;
-    String currentUserId;
-
+    private String currentUserId;
+    private List<User> users = new ArrayList<>();
+    private MainAdapter adapter;
+    private FirebaseAuth firebaseAuth;
+    private static final String TYPE = "addUser";
     public AddUserFragment() {
         // Required empty public constructor
     }
@@ -71,6 +78,7 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         getActivity().setTitle(getString(R.string.add_user_title));
         setHasOptionsMenu(true);
         storageReference = FirebaseStorage.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
         currentUserId = Utilities.getUserId();
     }
 
@@ -88,7 +96,8 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         UsersList.setHasFixedSize(true);
         UsersList.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        final FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
+        initList();
+        /*final FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder> firebaseRecyclerAdapter =
                 new FirebaseRecyclerAdapter<MessagesInfo, AddUserFragment.UserHolder>(
                         MessagesInfo.class
                         , R.layout.main_list_row
@@ -136,7 +145,51 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
 
         UsersList.setAdapter(firebaseRecyclerAdapter);
 
-        return view;
+*/        return view;
+    }
+
+    private void initList() {
+        adapter = new MainAdapter(getContext(),users,TYPE);
+        UsersList.setAdapter(adapter);
+
+        mDatabase
+                .addChildEventListener(new ChildEventListener() {
+                    @Override
+                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, String s) {
+                        String name = dataSnapshot.child(USERNAME_NODE).getValue(String.class);
+                        String imageurl = dataSnapshot.child(PROFILE_PIC).getValue(String.class);
+                        String key = dataSnapshot.getKey();
+                        User user = new User();
+
+                        if (!key.equals(firebaseAuth.getCurrentUser().getUid())) {
+                            user.setName(name);
+                            user.setImgeUrl(imageurl);
+                            user.setKey(key);
+                            users.add(user);
+                            adapter.notifyItemInserted(users.size() - 1);
+                        }
+                    }
+
+                    @Override
+                    public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                    }
+
+                    @Override
+                    public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 
     private void launchConvFragment(String friendId, String friendUsername
@@ -219,7 +272,9 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
         int id = item.getItemId();
         switch (id) {
             case android.R.id.home:
-                getActivity().finish();
+                if (getActivity() != null) {
+                    getActivity().finish();
+                }
                 break;
 
             default:
@@ -232,8 +287,9 @@ public class AddUserFragment extends Fragment implements SearchView.OnQueryTextL
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         try {
+            if (getActivity() != null)
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        } catch (Exception e) {
+        } catch (NullPointerException e) {
 
         }
     }

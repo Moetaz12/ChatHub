@@ -82,6 +82,7 @@ public class ConversationFragment extends Fragment {
     private User user;
     private ConversationAdapter adapter;
     private com.google.firebase.database.ChildEventListener childEventListener;
+    private LinearLayoutManager linearLayoutManager;
 
     public ConversationFragment() {
         // Required empty public constructor
@@ -138,7 +139,8 @@ public class ConversationFragment extends Fragment {
                 .child(MESSAGESINFO_NODE);
         setHasOptionsMenu(true);
         conversationList.setHasFixedSize(true);
-        conversationList.setLayoutManager(new LinearLayoutManager(getActivity()));
+        linearLayoutManager = new LinearLayoutManager(getActivity());
+        conversationList.setLayoutManager(linearLayoutManager);
         initList();
 
         sendIcon.setOnClickListener(new View.OnClickListener() {
@@ -170,6 +172,7 @@ public class ConversationFragment extends Fragment {
                         .setValue(new SharedPref(getContext()).GetItem(getString(R.string.usrename_pref)));
 
                 mesgToSend.setText("");
+                deletelist();
                 try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
                 mDatabase.addChildEventListener(childEventListener);
@@ -192,6 +195,7 @@ public class ConversationFragment extends Fragment {
                 com.google.firebase.database.ChildEventListener() {
             @Override
             public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+
                 String message = dataSnapshot.child("msg").getValue(String.class);
                 String sender = dataSnapshot.child("sender").getValue(String.class);
 
@@ -228,6 +232,13 @@ public class ConversationFragment extends Fragment {
         };
 
 
+    }
+
+    private void deletelist() {
+        if (messagesInfos != null){
+            messagesInfos.clear();
+            adapter.notifyDataSetChanged();
+        }
     }
 
     private void setImage(final String id, final ImageView imageView) {
